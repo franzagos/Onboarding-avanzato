@@ -31,6 +31,19 @@ Il sorgente completo è disponibile nella cartella [`loop-agentic-kb/`](loop-age
 - nessun target, claim, CPC, volume o performance inventati;
 - readiness distinta in brand, product, channel, campaign e publish;
 - orchestrazione multi-agent con ownership dei file e handoff strutturati.
+- richiesta esplicita degli input realmente bloccanti con la formula `Mi serve X`;
+- prosecuzione dei rami non bloccati, senza trasformare un draft in output launch-ready;
+- source/evidence ledger canonici, ID stabili e controllo dei riferimenti orfani.
+
+## Come gestisce i dati mancanti
+
+La Skill valuta il dato rispetto all'output richiesto. Un'informazione può essere facoltativa per l'onboarding e bloccante per una campagna live. Quando il blocco è reale, l'agente chiede il minimo necessario spiegando cosa non può completare:
+
+```text
+Mi serve il mercato e la lingua. Senza questo non posso validare prezzi, policy, keyword e landing.
+```
+
+Se il dato non è disponibile, la Skill propone un output ridotto, conserva il blocker e non lo presenta come equivalente a un deliverable pronto all'attivazione.
 
 ## Utilizzo
 
@@ -53,6 +66,8 @@ Per validare una KB completa:
 ```bash
 python3 loop-agentic-kb/scripts/validate_kb.py /percorso/output --mode full
 ```
+
+Durante la compilazione usare `--stage draft`; prima della revisione o attivazione usare rispettivamente `--stage review` e `--stage activation`.
 
 Per validare soltanto il nucleo ADV/Google:
 

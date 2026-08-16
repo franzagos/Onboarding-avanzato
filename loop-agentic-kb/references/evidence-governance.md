@@ -14,10 +14,9 @@
 
 | Stato | Significato |
 |---|---|
-| approved-for-ads | approvato esplicitamente con perimetro |
-| public-brand-claim | dichiarato pubblicamente dal brand, non ancora approvato per ADV |
-| observed-spec | specifica osservata e verificabile |
-| qualified-only | utilizzabile solo con caveat |
+| approved_for_ads | approvato esplicitamente con perimetro |
+| observed_not_approved | osservato o dichiarato pubblicamente, non approvato per ADV |
+| qualified_only | utilizzabile solo con caveat |
 | blocked | non pubblicabile senza nuova prova |
 
 ## Campi minimi di una prova
@@ -25,12 +24,12 @@
 ```yaml
 evidence_id: EV-000
 statement: ""
-source_url: ""
+  source_id: "SRC-000"
 source_type: "official|internal|review|retailer|editorial|tool"
 observed_at: "YYYY-MM-DD"
 market: "global|IT|DE|..."
 scope: "brand|category|product_id|policy"
-status: "evidence|inference|hypothesis|missing|blocked"
+  status: "evidence"
 confidence: "high|moderate|low"
 expires_at: null
 notes: ""
@@ -47,6 +46,8 @@ notes: ""
 
 Una fonte più autorevole non cancella automaticamente un'esperienza cliente: descrivono oggetti diversi.
 
+Usare `sources.yaml` per le fonti e `evidence-ledger.yaml` per le prove. Un claim non deve duplicare URL o record evidence.
+
 ## Dati mutevoli
 
 Prezzi, stock, spedizione, resi, policy, specifiche di piattaforma e competitor richiedono data di accesso e ricontrollo prima della pubblicazione.
@@ -61,4 +62,3 @@ Prezzi, stock, spedizione, resi, policy, specifiche di piattaforma e competitor 
 ## Contraddizioni
 
 Registrare entrambe le fonti, definire cosa misurano, attribuire affidabilità per la decisione e aprire un gap. Non scegliere la versione più favorevole.
-

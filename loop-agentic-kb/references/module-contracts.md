@@ -24,6 +24,8 @@ Ogni modulo Markdown deve contenere:
 
 Ogni YAML deve usare ID stabili, stringhe quotate quando ambigue, `null` per dati mancanti e stato esplicito.
 
+Ogni file deve dichiarare `schema_version: "2.0"`. Usare esclusivamente nomi, ID, vocabolari e readiness definiti in `canonical-schema.md`. Ogni modulo deve elencare `blocking_input_ids`; se non ne ha, usare `[]`.
+
 ## Moduli foundation
 
 | File | Scopo | Dipendenze |
@@ -51,11 +53,11 @@ Ogni YAML deve usare ID stabili, stringhe quotate quando ambigue, `null` per dat
 |---|---|---|
 | 11-product-offer-registry | fatti commerciali per prodotto | 01–02 + dati interni |
 | 12-claims-proof-library | governare pubblicabilità | tutte le fonti |
-| 13-funnel-awareness-matrix | messaggi per fase | 02, 04–07, 12 |
-| 14-creative-strategy-library | angoli e format sostenibili | 08–13 |
-| 15-meta-ads-brief | handoff Meta | 11–14 |
+| 13-funnel-awareness-matrix.yaml | messaggi per fase con `FUN-*` | 02, 04–07, 12 |
+| 14-creative-strategy-library.yaml | angoli e format con `ANG-*` | 08–13 |
+| 15-meta-ads-brief.yaml | handoff Meta e blocker | 11–14 |
 | 16-google-ads-playbook | intenti e readiness Google | 11–13 |
-| 17-landing-page-map | query/intento → pagina | 11–13, 16 |
+| 17-landing-page-map.yaml | `INT-*` → `LND-*` | 11–13, 16 |
 | 18-asset-library | inventario asset e diritti | repository asset |
 | 19-market-packs | localizzazione senza contaminare core | 01–18 |
 
@@ -63,7 +65,7 @@ Ogni YAML deve usare ID stabili, stringhe quotate quando ambigue, `null` per dat
 
 | File | Scopo | Dipendenze |
 |---|---|---|
-| 20-measurement-framework | KPI, eventi e fonti | obiettivi canale |
+| 20-measurement-framework.yaml | KPI, eventi e fonti | obiettivi canale |
 | 21-experiment-memory | memoria contestuale dei test | 20 + risultati |
 
 ## Handoff minimo tra agenti
@@ -84,3 +86,15 @@ do_not_assume: []
 
 L'orchestratore deve rifiutare un handoff che non distingue decisioni, ipotesi e gap.
 
+## Registri trasversali
+
+| File | Autorità |
+|---|---|
+| `sources.yaml` | record `SRC-*` |
+| `evidence-ledger.yaml` | record `EV-*` |
+| `assumptions-and-gaps.yaml` | assunzioni, gap e `INP-*` |
+| `context-pack.yaml` | indice compatto per ID, senza duplicare record canonici |
+| `review-checklist.yaml` | decisioni umane con owner, due date e pass/fail |
+| `qa-report.yaml` | errori atomici `QA-*` e gate finali |
+
+Se un input bloccante emerge, applicare `blocking-input-protocol.md` prima di dichiarare completo il modulo interessato.

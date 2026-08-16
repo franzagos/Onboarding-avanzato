@@ -1,0 +1,49 @@
+meta:
+  schema_version: "2.0"
+  brand_id: "{{BRAND_ID}}"
+  generated_at: "{{DATE}}"
+  last_reviewed_at: null
+  status: "draft"
+  source_of_truth: true
+assumptions: []
+gaps: []
+missing_inputs:
+  - input_id: "INP-product-feed"
+    label: "feed prodotto autorevole"
+    classification: "branch_blocking"
+    required_for: ["activation_ready"]
+    affected_modules: ["11-product-offer-registry.yaml"]
+    reason: "Prezzo, stock, varianti e landing devono provenire da una fonte commerciale autorevole."
+    minimum_acceptable: "CSV o export con SKU, variante, prezzo, stock, mercato e URL."
+    request_text: "Mi serve il feed prodotto autorevole."
+    status: "identified"
+    owner: "user"
+    requested_at: null
+    resolved_at: null
+    resolution_evidence_ids: []
+  - input_id: "INP-claim-approval"
+    label: "approvazione dei claim pubblicitari"
+    classification: "branch_blocking"
+    required_for: ["publish_ready"]
+    affected_modules: ["12-claims-proof-library.yaml"]
+    reason: "Un claim osservato non equivale a un claim approvato per ADV."
+    minimum_acceptable: "Owner, claim autorizzati, mercati/canali e data di approvazione."
+    request_text: "Mi serve l'approvazione dei claim pubblicitari."
+    status: "identified"
+    owner: "user"
+    requested_at: null
+    resolved_at: null
+    resolution_evidence_ids: []
+  - input_id: "INP-asset-rights"
+    label: "diritti paid media degli asset"
+    classification: "branch_blocking"
+    required_for: ["publish_ready"]
+    affected_modules: ["18-asset-library.yaml"]
+    reason: "La presenza online non dimostra il diritto di riuso in advertising."
+    minimum_acceptable: "Inventario DAM o conferma owner con scope, canali, mercati e scadenza."
+    request_text: "Mi serve la conferma dei diritti paid media degli asset."
+    status: "identified"
+    owner: "user"
+    requested_at: null
+    resolved_at: null
+    resolution_evidence_ids: []

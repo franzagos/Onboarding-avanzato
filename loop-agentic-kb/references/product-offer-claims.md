@@ -39,13 +39,13 @@ Separare prodotto e offerta. Un'offerta richiede prezzo, incentivo, condizioni, 
 ## Claims ledger
 
 ```yaml
-- claim_id: "CL-000"
-  text_max: ""
-  subject_scope: "brand|family_id|product_id"
+- claim_id: "ACL-000"
+  canonical_text: null
+  subject_type: "brand|family|product"
+  subject_id: null
   market: ""
   evidence_ids: []
-  source_url: ""
-  status: "approved-for-ads|public-brand-claim|observed-spec|qualified-only|blocked"
+  status: "approved_for_ads|observed_not_approved|qualified_only|blocked"
   qualification: null
   owner: null
   approved_at: null
@@ -57,5 +57,4 @@ Separare prodotto e offerta. Un'offerta richiede prezzo, incentivo, condizioni, 
 
 Un prodotto è `product_ready` soltanto se nome/variante, prezzo, stock, landing, specifiche chiave, claim e condizioni operative sono verificati per il mercato.
 
-Un'offerta è `campaign_ready` soltanto se economics e tracking consentono una decisione media; questi dati possono restare riservati ma devono avere owner e stato.
-
+Un'offerta contribuisce ad `activation_ready: pass` soltanto se economics e tracking consentono una decisione media; questi dati possono restare riservati ma devono avere owner e stato. Se l'utente richiede una campagna eseguibile e tali dati mancano, applicare `blocking-input-protocol.md`.

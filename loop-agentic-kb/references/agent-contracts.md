@@ -23,7 +23,7 @@ task:
     allowed_urls: ["https://..."]
   write_scope:
     directory: "staging/a1-brand-portfolio"
-    files: ["brand-knowledge.md", "portfolio.yaml", "evidence.yaml"]
+    files: ["01-knowledge-base.md", "11-product-offer-registry.yaml", "evidence-ledger.yaml"]
   forbidden:
     - "invent missing data"
     - "edit final package"
@@ -31,6 +31,9 @@ task:
   completion:
     required_sections: []
     validation_schema: "references/schemas/<schema>.yaml"
+  missing_input_policy:
+    classify_with: "references/blocking-input-protocol.md"
+    user_contact_owner: "orchestrator"
 ```
 
 ## Output envelope universale
@@ -53,6 +56,7 @@ handoff:
     unresolved_conflicts: 0
   high_impact_findings: []
   blocked_items: []
+  blocking_input_ids: []
   assumptions_added: []
   dependencies_for_next: []
   validation:
@@ -111,7 +115,7 @@ Un estratto deve essere breve e necessario. Gli agenti devono parafrasare e risp
 claim:
   claim_id: "CLM-0001"
   statement: "<atomic statement>"
-  epistemic_status: "inference" # observed | inference | hypothesis
+  epistemic_status: "inference" # evidence | inference | hypothesis
   confidence: "moderate" # high | moderate | low
   evidence_ids: ["EV-0001", "EV-0002"]
   counterevidence_ids: []
@@ -128,10 +132,10 @@ claim:
 
 ### Regole epistemiche
 
-- `observed`: direttamente presente in una fonte citata.
+- `evidence`: direttamente presente in una fonte citata.
 - `inference`: conclusione supportata da almeno due osservazioni convergenti o da una catena esplicita.
 - `hypothesis`: modello utile ma non validato; deve includere un test.
-- `approved`: stato di governance conferito solo da un owner autorizzato, mai dedotto dall'agente.
+- `approved_for_ads`: stato di governance conferito solo da un owner autorizzato, mai dedotto dall'agente.
 - `blocked`: non utilizzabile in output pubblici finché la condizione indicata non viene risolta.
 - Usare confidence verbale, non percentuali pseudo-precise.
 - Una fonte ufficiale prova cosa dichiara il brand, non superiorità oggettiva.
@@ -151,8 +155,8 @@ claim:
 
 **Output di proprietà**
 
-- `brand-knowledge.md`;
-- `product-message-map.md`;
+- `01-knowledge-base.md`;
+- `02-product-message-map.md`;
 - `portfolio.yaml`;
 - `product-registry-draft.yaml`;
 - `evidence.yaml`;
@@ -166,7 +170,7 @@ product:
   name: "..."
   family_id: "FAM-..."
   commercial_role: "unknown" # hero | acquisition | margin | retention | seasonal | unknown
-  status: "observed"
+  status: "evidence"
   markets: []
   price_snapshots: []
   stock_snapshots: []
@@ -206,7 +210,7 @@ voice_sample:
   funnel_stage: "consideration"
   text_excerpt: "<brief>"
   observed_patterns: []
-  status: "observed" # observed | approved | rejected
+  status: "evidence" # evidence | approved | rejected
 ```
 
 **Regole:** almeno tre contesti quando disponibili; separare personalità stabile da modulazione; nessun esempio è `approved` senza conferma; VOC mantenuta fuori dal corpus brand.
@@ -221,7 +225,7 @@ voice_sample:
 
 **Output di proprietà**
 
-- `competitor-analysis.md`;
+- `03-competitors.md`;
 - `competitors.yaml`;
 - `reviews-voc.md`;
 - `review-corpus-summary.yaml`;
@@ -315,7 +319,7 @@ friction:
   persona_ids: []
   product_ids: []
   description: "..."
-  status: "observed" # observed | inferred | hypothesized
+  status: "evidence" # evidence | inference | hypothesis
   evidence_ids: []
   severity: "unknown"
   frequency: "unknown"
@@ -371,7 +375,8 @@ ad_claim:
 
 **Output di proprietà**
 
-- `creative-strategy-library.yaml`;
+- `14-creative-strategy-library.yaml`;
+- `15-meta-ads-brief.yaml`;
 - `creative-gaps.yaml`.
 
 ```yaml
@@ -406,16 +411,16 @@ creative_angle:
 
 **Output di proprietà**
 
-- `google-ads-playbook.md`;
+- `16-google-ads-playbook.md`;
 - `search-intents.yaml`;
-- `landing-page-map.yaml`.
+- `17-landing-page-map.yaml`.
 
 ```yaml
 search_intent:
   intent_id: "INT-..."
   query_cluster: "..."
   intent_type: "category" # brand | product | category | problem | gifting | designer | competitor
-  status: "hypothesis" # observed only with query data
+  status: "hypothesis" # evidence only with query data
   product_ids: []
   persona_ids: []
   landing_page_id: null
@@ -437,8 +442,8 @@ search_intent:
 
 **Output di proprietà**
 
-- `asset-library.yaml`;
-- `market-packs/<market>.md`;
+- `18-asset-library.yaml`;
+- `19-market-packs/<market>.md`;
 - `market-gaps.yaml`.
 
 ```yaml
@@ -469,8 +474,8 @@ asset:
 
 **Output di proprietà**
 
-- `measurement-framework.yaml`;
-- `experiment-memory.yaml`;
+- `20-measurement-framework.yaml`;
+- `21-experiment-memory.yaml`;
 - `tracking-gaps.yaml`.
 
 ```yaml
@@ -523,6 +528,7 @@ Il reviewer non riscrive il package. L'orchestratore applica fix mirati e regist
 4. L'agente a valle riceve path e versione, non copie incollate o riassunti non tracciati.
 5. Se una dipendenza è `degraded`, il downstream deve propagare il limite.
 6. Se una dipendenza è `blocked`, il downstream può produrre struttura e gap, ma non conclusioni fondate sul dato mancante.
+7. Il sub-agent assegna un `INP-*` a ogni blocker e lo restituisce all'orchestratore. Solo l'orchestratore chiede all'utente, usando obbligatoriamente il formato `Mi serve X` definito in `blocking-input-protocol.md`.
 
 ## Convenzioni ID
 
@@ -558,6 +564,3 @@ Un task è `complete` quando:
 - l'handoff indica ciò che il downstream può e non può usare.
 
 È `degraded` quando l'output è utile ma una fonte o sezione non critica manca. È `blocked` solo quando non può produrre nemmeno un artefatto strutturale affidabile.
-
-
-

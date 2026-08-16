@@ -8,7 +8,7 @@ Per ogni obiettivo dichiarare:
 |---|---|
 | objective_id | ID stabile |
 | business outcome | risultato economico |
-| primary KPI | metrica decisionale |
+| primary KPI | `MET-*` della metrica decisionale |
 | diagnostic KPI | metriche esplicative |
 | source | piattaforma o analytics |
 | attribution window | definita, non assunta |
@@ -38,10 +38,11 @@ Registrare nome evento, definizione, trigger, piattaforma, deduplica, valore, va
   variant: ""
   start_date: null
   end_date: null
-  primary_metric: ""
+  primary_metric_id: null
   result: null
   sample_context: null
-  decision: "planned|run|adopt|reject|inconclusive"
+  lifecycle: "planned|qa|running|completed|cancelled"
+  decision: "pending|adopt|iterate|reject|inconclusive"
   learning: null
   limitations: []
   reusable_when: []
@@ -49,4 +50,3 @@ Registrare nome evento, definizione, trigger, piattaforma, deduplica, valore, va
 ```
 
 Un learning è riutilizzabile solo se conserva contesto e limitazioni. `Winner` senza metrica, periodo e confronto è un'etichetta, non conoscenza.
-

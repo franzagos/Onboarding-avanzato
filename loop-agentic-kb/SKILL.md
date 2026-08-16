@@ -19,6 +19,7 @@ Costruire una KB operativa che separi identità stabile, decisioni di mercato, d
 - Conservare output validi esistenti; aggiornare solo moduli obsoleti o insufficienti.
 
 Leggere sempre [evidence-governance.md](references/evidence-governance.md). Leggere [module-contracts.md](references/module-contracts.md) prima di creare file e [agent-contracts.md](references/agent-contracts.md) prima di delegare.
+Leggere [blocking-input-protocol.md](references/blocking-input-protocol.md) durante l'intake e prima di ogni readiness gate. Leggere [canonical-schema.md](references/canonical-schema.md) prima di assegnare ID o creare registri YAML.
 
 ## Intake
 
@@ -34,7 +35,23 @@ Raccogliere ciò che esiste senza richiedere di nuovo informazioni già presenti
 - esempi on-brand/off-brand;
 - canali previsti.
 
-Se un dato cambia la pubblicabilità ma manca, procedere con schema compilato e stato `blocked_missing_input`.
+Classificare ogni dato mancante rispetto all'output richiesto:
+
+- `non_blocking`: riduce confidence o profondità, ma consente un output affidabile;
+- `branch_blocking`: blocca solo un modulo o canale; completare i rami indipendenti;
+- `run_blocking`: impedisce di produrre l'output richiesto senza inventare o scegliere arbitrariamente.
+
+Per un input `branch_blocking` o `run_blocking`, applicare il protocollo obbligatorio:
+
+1. non inventare placeholder semantici come se fossero decisioni;
+2. chiedere all'utente il dato prima di superare il gate;
+3. iniziare la richiesta con la frase esatta **"Mi serve X"**, sostituendo X con il dato concreto; `brief`, `dati`, `informazioni`, `dettagli`, `materiali` e `input` da soli non sono X validi;
+4. spiegare in una frase cosa rimane bloccato e il formato minimo accettabile;
+5. raggruppare solo blocker collegati, senza ripetere dati già disponibili o reperibili dalle fonti autorizzate.
+
+Esempio: `Mi serve il mercato di destinazione. Senza paese e lingua non posso validare prezzi, policy, keyword e landing. È sufficiente indicare paese e lingua.`
+
+Se l'utente non dispone del dato, proporre esplicitamente un output ridotto e marcarlo `blocked_missing_input`; non descriverlo come equivalente all'output richiesto. Vedere [blocking-input-protocol.md](references/blocking-input-protocol.md).
 
 ## Modalità
 
@@ -102,19 +119,25 @@ Usare questa struttura; vedere dettagli in [module-contracts.md](references/modu
 10-lexicon.md
 11-product-offer-registry.yaml
 12-claims-proof-library.yaml
-13-funnel-awareness-matrix.md
-14-creative-strategy-library.md
-15-meta-ads-brief.md
+13-funnel-awareness-matrix.yaml
+14-creative-strategy-library.yaml
+15-meta-ads-brief.yaml
 16-google-ads-playbook.md
-17-landing-page-map.md
+17-landing-page-map.yaml
 18-asset-library.yaml
 19-market-packs/
-20-measurement-framework.md
+20-measurement-framework.yaml
 21-experiment-memory.yaml
-sources.md
-assumptions-and-gaps.md
+sources.yaml
+evidence-ledger.yaml
+assumptions-and-gaps.yaml
 context-pack.yaml
+strategic-summary.md
+review-checklist.yaml
+qa-report.yaml
 ```
+
+Questi nomi sono canonici. Non produrre alias legacy come `01a`, `07a`, `07b` o numerazioni alternative. I Markdown devono usare nel titolo lo stesso numero del filename. `sources.yaml`, `evidence-ledger.yaml` e `12-claims-proof-library.yaml` sono le autorità rispettivamente per fonti, prove e pubblicabilità dei claim; gli altri moduli li referenziano tramite ID e non ne duplicano il contenuto.
 
 ## Moduli commerciali strutturati
 
@@ -122,7 +145,7 @@ Leggere [product-offer-claims.md](references/product-offer-claims.md) per compil
 
 - Il registry prodotto descrive fatti e ruolo commerciale; non elegge hero sulla sola prominenza visiva.
 - Il claim ledger contiene formulazione massima, fonte, perimetro, stato, owner e scadenza.
-- `observed` non significa `approved-for-ads`.
+- `evidence` non significa `approved_for_ads`.
 - Prezzo e disponibilità devono avere mercato, valuta e data.
 
 ## ADV e creative
@@ -171,15 +194,15 @@ Usare `--mode nucleus` per un handoff ADV/Google deliberatamente ridotto. Gli sc
 
 ## Readiness
 
-Assegnare separatamente:
+Assegnare separatamente e con i soli valori `pass|conditional|blocked|not_applicable`:
 
-- `brand_ready`: identità, portafoglio, voce e fonti sufficienti;
-- `product_ready`: prodotto, prezzo, stock e prove sufficienti;
-- `channel_ready`: struttura del canale e asset disponibili;
-- `campaign_ready`: mercato, target, obiettivo, offer, destination, economics e tracking definiti;
-- `publish_ready`: claim approvati, asset autorizzati e QA completata.
+- `framework_ready`: struttura e registri canonici validi;
+- `onboarding_ready`: identità, portafoglio, competitor, cliente, voce e fonti sufficienti per onboarding;
+- `strategy_ready`: personas, pain, funnel e ipotesi collegati alle prove;
+- `activation_ready`: prodotto, mercato, canale, landing, asset ed economics sufficienti per costruire una campagna;
+- `publish_ready`: claim approvati, stock/prezzo ricontrollati, asset autorizzati, tracking e QA completati.
 
-Non comprimere questi stati in un unico sì/no.
+Ogni stato deve includere `status`, `blocking_input_ids`, `conditions` e `last_checked_at`. Non comprimere gli stati in un unico sì/no e non usare `partial`, `ready-with-conditions` o booleani come sinonimi.
 
 ## Quality gate finale
 
@@ -190,7 +213,8 @@ Non comprimere questi stati in un unico sì/no.
 - Brand Voice e VOC sono separate.
 - Product registry, claim ledger e landing mapping usano ID coerenti.
 - I brief di canale espongono input bloccanti.
+- Ogni input bloccante ha un `input_id`, un output impattato e una richiesta utente nel formato `Mi serve X`.
+- Nessun ID referenziato è orfano e ogni file dichiara `schema_version`.
 - Contraddizioni tra fonti sono conservate e risolte esplicitamente.
 - `validate_kb.py` termina senza errori strutturali.
 - Un revisore può usare la KB senza ricostruire il contesto dalla chat.
-

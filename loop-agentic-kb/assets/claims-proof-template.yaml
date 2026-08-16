@@ -1,19 +1,14 @@
 meta:
-  brand: ""
-  observed_at: "YYYY-MM-DD"
+  schema_version: "2.0"
+  brand_id: "{{BRAND_ID}}"
+  generated_at: "{{DATE}}"
+  last_reviewed_at: null
   status: "draft"
-evidence: []
-claims:
-  - claim_id: "CL-000"
-    text_max: ""
-    subject_scope: ""
-    market: ""
-    evidence_ids: []
-    source_url: ""
+  source_of_truth: true
+claims: []
+readiness:
+  publish_ready:
     status: "blocked"
-    qualification: null
-    owner: null
-    approved_at: null
-    expires_at: null
-    prohibited_variants: []
-
+    blocking_input_ids: ["INP-claim-approval"]
+    conditions: []
+    last_checked_at: "{{DATE}}"

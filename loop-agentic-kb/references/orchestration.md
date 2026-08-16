@@ -13,7 +13,7 @@ L'architettura evolve l'Onboarding 4.0 esistente: conserva evidence-first, check
 3. Il parallelismo è usato solo tra task senza dipendenze informative forti.
 4. Ogni output porta fatti, inferenze, ipotesi, fonti, limiti e gap in forma strutturata.
 5. Un campo mancante resta `unknown` o `not_observed`; non viene completato con plausibilità.
-6. Ogni modulo conserva la distinzione tra `observed`, `inferred`, `hypothesized`, `approved` e `blocked`.
+6. Ogni modulo usa il vocabolario canonico `evidence`, `inference`, `hypothesis`, `missing`, `blocked`.
 7. “Campaign-ready” è uno stato verificabile, non una formula editoriale.
 8. Se i sub-agent non sono disponibili, lo stesso DAG viene eseguito in sequenza dall'orchestratore.
 
@@ -21,9 +21,9 @@ L'architettura evolve l'Onboarding 4.0 esistente: conserva evidence-first, check
 
 ```text
 00-agent-manifest.md
-01-brand-knowledge.md
+01-knowledge-base.md
 02-product-message-map.md
-03-competitor-analysis.md
+03-competitors.md
 04-personas.md
 05-psychographics.md
 06-pain-points.md
@@ -33,19 +33,22 @@ L'architettura evolve l'Onboarding 4.0 esistente: conserva evidence-first, check
 10-lexicon.md
 11-product-offer-registry.yaml
 12-claims-proof-library.yaml
-13-funnel-awareness-matrix.md
+13-funnel-awareness-matrix.yaml
 14-creative-strategy-library.yaml
-15-google-ads-playbook.md
-16-landing-page-map.yaml
-17-asset-library.yaml
-18-market-packs/<market>.md
-19-measurement-framework.yaml
-20-experiment-memory.yaml
-21-governance.md
+15-meta-ads-brief.yaml
+16-google-ads-playbook.md
+17-landing-page-map.yaml
+18-asset-library.yaml
+19-market-packs/<market>.md
+20-measurement-framework.yaml
+21-experiment-memory.yaml
 strategic-summary.md
 sources.yaml
-assumptions-and-gaps.md
+evidence-ledger.yaml
+assumptions-and-gaps.yaml
 context-pack.yaml
+review-checklist.yaml
+qa-report.yaml
 ```
 
 Il formato Markdown serve alla lettura umana; YAML serve al consumo da parte di altri agenti. Se un modulo non è applicabile, il file viene comunque creato con `status: not_applicable` e motivazione.
@@ -148,7 +151,7 @@ L'orchestratore:
 - assegna ID stabili a run, prodotti, fonti, claim, personas e test;
 - definisce freshness richiesta per prezzi, stock, policy e advertising.
 
-**Gate G0:** scope sufficiente, fonti/accessi noti, output path determinato. Se mancano dati non bloccanti, procedere dichiarandoli; chiedere input solo se la scelta cambierebbe materialmente il lavoro.
+**Gate G0:** scope sufficiente, fonti/accessi noti, output path determinato. Classificare gli input mancanti con `blocking-input-protocol.md`. Procedere sui gap `non_blocking`; per un `run_blocking`, chiedere all'utente iniziando con `Mi serve X`; per un `branch_blocking`, completare i rami indipendenti e chiedere prima di entrare nel ramo bloccato.
 
 ### Onda 1 — Foundation parallela
 
@@ -186,7 +189,7 @@ Eseguire in parallelo:
 - A7 su creative strategy;
 - A8 su Google Ads e landing map.
 
-Gli agenti possono generare framework e backlog di test. Possono generare copy pubblicabile solo se il manifest include mercato, offerta, claim autorizzati e approvazione esplicita.
+Gli agenti possono generare framework e backlog di test. Possono generare copy pubblicabile solo se il manifest include mercato, offerta, claim autorizzati e approvazione esplicita. Se manca un input necessario all'output richiesto, l'orchestratore usa il protocollo `Mi serve X`; il sub-agent registra il blocker ma non interroga direttamente l'utente salvo incarico esplicito.
 
 **Merge M3:** verificare che tutti gli angoli e le query arrivino a una pagina, un prodotto, una persona, una prova e una fase funnel. Elementi non collegabili sono backlog, non raccomandazioni.
 
@@ -269,15 +272,15 @@ Una recensione può essere la fonte primaria di una percezione, non della qualit
 
 ## Readiness model
 
-| Stato | Condizioni minime |
+| Dimensione | Condizioni minime |
 |---|---|
-| `onboarding-ready` | brand, portfolio, competitor, voice, VOC e fonti completi con caveat |
-| `strategy-ready` | anche personas/pain/funnel collegati e gap espliciti |
-| `creative-ready` | claim library, asset requirements, angoli e ToV per contesto |
-| `campaign-ready` | mercato, stock, economics, offerta, landing, tracking e claim approvati |
-| `degraded` | uno o più moduli critici incompleti; uso consentito solo entro limiti dichiarati |
+| `framework_ready` | file, schema, ID e registri canonici validi |
+| `onboarding_ready` | brand, portfolio, competitor, voice, VOC e fonti completi con caveat |
+| `strategy_ready` | personas, pain e funnel collegati a evidenze e gap |
+| `activation_ready` | mercato, prodotto/offerta, economics, landing, asset e tracking definiti |
+| `publish_ready` | claim approvati, diritti, freshness e QA completati |
 
-Gli stati non sono cumulativi per forza: un brand può essere creative-ready per ideazione e non campaign-ready per mancanza di stock o tracking.
+Ogni dimensione usa `pass|conditional|blocked|not_applicable` e include blocker e condizioni. Un brand può avere `strategy_ready: pass` e `activation_ready: blocked`.
 
 ## Failure modes e recovery
 
@@ -318,8 +321,6 @@ Il package è consegnabile solo se:
 - numeri e recensioni espongono campione, periodo e limite;
 - voice, tone, lessico e VOC sono separati;
 - non ci sono ID orfani o link interni rotti;
-- gli unknown critici compaiono in `assumptions-and-gaps.md`;
+- gli unknown critici compaiono in `assumptions-and-gaps.yaml` come `INP-*`;
 - readiness e usi vietati sono dichiarati nel manifest.
-
-
 

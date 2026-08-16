@@ -7,9 +7,9 @@ Scopo: trasformare una Brand KB verificabile in moduli riutilizzabili da agenti 
 
 Il sistema genera tre artefatti distinti:
 
-1. `13-funnel-awareness-matrix.md`: collega persona, job, prodotto, consapevolezza, messaggio, prova, obiezione, CTA e landing page.
-2. `14-creative-strategy-library.md`: conserva territori, concept e pattern creativi come ipotesi testabili, non come campagne già validate.
-3. `15-meta-ads-brief.md`: verifica la readiness della campagna e produce un brief eseguibile solo quando gli input bloccanti sono disponibili.
+1. `13-funnel-awareness-matrix.yaml`: collega persona, job, prodotto, consapevolezza, messaggio, prova, obiezione, CTA e landing page.
+2. `14-creative-strategy-library.yaml`: conserva territori, concept e pattern creativi come ipotesi testabili, non come campagne già validate.
+3. `15-meta-ads-brief.yaml`: verifica la readiness della campagna e produce un brief eseguibile solo quando gli input bloccanti sono disponibili.
 
 Questi moduli non sostituiscono la Brand KB. La Brand KB stabilisce cosa è vero; il playbook stabilisce come organizzare ciò che è vero per l'attivazione.
 
@@ -41,7 +41,7 @@ Questi moduli non sostituiscono la Brand KB. La Brand KB stabilisce cosa è vero
 - tracking e KPI primario;
 - diritti e disponibilità degli asset.
 
-Se mancano prodotto/offerta, target o obiettivo, il sistema non genera copy Meta. Consegna esclusivamente diagnosi, struttura e domande di completamento.
+Se mancano prodotto/offerta, target o obiettivo, il sistema non genera copy Meta. Applicare `blocking-input-protocol.md`: chiedere all'utente iniziando con `Mi serve X`, spiegare cosa blocca e indicare il formato minimo. Se il blocker riguarda soltanto il lancio o la pubblicazione, consegnare il massimo draft affidabile con stato esplicito, senza elevarlo a ready.
 
 ## 3. Modello epistemico obbligatorio
 
@@ -52,10 +52,10 @@ Ogni record deve avere uno stato:
 | `evidence` | osservato in fonte tracciata | utilizzabile entro il perimetro della fonte |
 | `inference` | interpretazione supportata | utilizzabile come strategia, non come fatto pubblico |
 | `hypothesis` | idea da verificare | utilizzabile solo in test esplicitamente etichettato |
-| `approved-for-ads` | validato da owner e prova | pubblicabile entro mercato, prodotto e data definiti |
+| `approved_for_ads` | validato da owner e prova | pubblicabile entro mercato, prodotto e data definiti |
 | `blocked` | mancano prova o autorizzazione | non deve entrare nel copy pubblico |
 
-Mai promuovere automaticamente `public-brand-claim` ad `approved-for-ads`. Prezzi, stock, tempi, policy e promozioni devono avere una data di ricontrollo.
+Mai promuovere automaticamente `observed_not_approved` ad `approved_for_ads`. Prezzi, stock, tempi, policy e promozioni devono avere una data di ricontrollo.
 
 ## 4. Architettura multi-agente
 
@@ -73,7 +73,7 @@ Quando l'ambiente consente parallelismo, l'orchestratore assegna quattro stream 
 1. Risolve conflitti usando questa priorità: prove approvate → fonti primarie → Brand KB → inferenze → ipotesi.
 2. Elimina concept che non possiedono una catena completa.
 3. Propaga i gap nei tre artefatti; non li nasconde con placeholder ambigui.
-4. Consegna un solo stato finale: `ready`, `ready-with-conditions` oppure `blocked`.
+4. Consegna readiness per dimensione con `pass`, `conditional`, `blocked` o `not_applicable`.
 
 ## 5. Workflow
 
@@ -165,7 +165,7 @@ funnel_record:
 
 ```yaml
 creative_concept:
-  id: "CR-000"
+  angle_id: "ANG-000"
   status: hypothesis
   title: ""
   product: ""
@@ -193,7 +193,10 @@ creative_concept:
 
 ```yaml
 meta_brief:
-  readiness: ready|ready-with-conditions|blocked
+  schema_version: "2.0"
+  readiness:
+    activation_ready: {status: blocked, blocking_input_ids: [], conditions: [], last_checked_at: "YYYY-MM-DD"}
+    publish_ready: {status: blocked, blocking_input_ids: [], conditions: [], last_checked_at: "YYYY-MM-DD"}
   market: null
   language: null
   product: null
@@ -220,9 +223,9 @@ meta_brief:
 
 ## 9. Quality score senza falsa precisione
 
-Usare solo `pass`, `conditional` o `fail`:
+Usare solo `pass`, `conditional` o `blocked`:
 
-| Gate | Pass | Conditional | Fail |
+| Gate | Pass | Conditional | Blocked |
 |---|---|---|---|
 | Evidence | claim approvati e tracciati | fonti pubbliche da approvare | claim assenti/incoerenti |
 | Audience | segmento validato | persona ipotetica accettata come test | target assente |
@@ -231,7 +234,7 @@ Usare solo `pass`, `conditional` o `fail`:
 | Assets | disponibili e autorizzati | produzione pianificata | concept dipende da asset inesistenti |
 | Measurement | evento e KPI definiti | tracking da QA | metrica assente |
 
-Non calcolare un punteggio numerico di readiness: maschererebbe la natura bloccante di alcuni campi.
+Non calcolare un punteggio numerico di readiness: maschererebbe la natura bloccante di alcuni campi. Ogni gate bloccato deve avere almeno un `INP-*` in `assumptions-and-gaps.yaml`.
 
 ## 10. Regole di aggiornamento
 
@@ -239,8 +242,5 @@ Non calcolare un punteggio numerico di readiness: maschererebbe la natura blocca
 - Le performance entrano nella KB solo con mercato, audience, offerta, placement, periodo e spend associati.
 - Un apprendimento creativo non viene generalizzato oltre il contesto del test.
 - Le varianti perdenti non vengono eliminate: restano come `rejected-with-evidence` con motivazione.
-- La Brand Voice passa da `observed` ad `approved` solo dopo revisione del brand.
+- La Brand Voice passa da osservata in `evidence` ad approvata solo dopo revisione del brand.
 - Gli agenti a valle devono citare gli ID usati e segnalare qualsiasi campo mancante.
-
-
-

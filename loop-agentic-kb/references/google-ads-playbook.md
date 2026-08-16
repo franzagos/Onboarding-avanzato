@@ -15,14 +15,14 @@ Questo modulo trasforma una Brand KB in istruzioni eseguibili per agenti Google 
 - claim e asset autorizzati;
 - tracking e consenso verificati.
 
-Se mancano prezzo, stock, margine o tracking, l'agente può produrre una strategia esplorativa ma deve impostare `campaign_ready: false`.
+Se mancano prezzo, stock, margine o tracking, l'agente può produrre una strategia esplorativa ma deve impostare `activation_ready.status: blocked`. Se l'utente chiede un piano eseguibile o launch-ready, applicare `blocking-input-protocol.md` e chiedere il dato iniziando con `Mi serve X`.
 
 ## Regole epistemiche
 
 Etichettare ogni elemento come:
 
-- `verified`: presente in fonte primaria o dato interno datato;
-- `inferred`: deduzione ragionevole dalla KB;
+- `evidence`: presente in fonte primaria o dato interno datato;
+- `inference`: deduzione ragionevole dalla KB;
 - `hypothesis`: proposta da verificare con query e test;
 - `blocked`: non utilizzabile senza dato o approvazione.
 
@@ -231,7 +231,7 @@ Registrare ogni test con ipotesi, segmento, campagna, periodo, cambiamenti, metr
 ## Output obbligatori del modulo
 
 1. `google-ads-playbook.md`: strategia applicata al brand.
-2. `landing-page-map.md`: intento → pagina → proof → gap.
+2. `17-landing-page-map.yaml`: intento → pagina → proof → gap.
 3. `keyword-hypotheses.csv|yaml`: opzionale, solo se richiesto.
 4. `feed-readiness.md`: può essere incluso nel playbook.
 5. `sources-and-assumptions`: fonti, data, status e gap.
@@ -248,6 +248,7 @@ Registrare ogni test con ipotesi, segmento, campagna, periodo, cambiamenti, metr
 - [ ] Claim e promozioni hanno fonte, mercato e scadenza.
 - [ ] Tracking e checkout sono testati prima del lancio.
 - [ ] PMax non nasconde categorie con economics incompatibili.
+- [ ] Ogni blocker launch/publish ha un `INP-*` e una richiesta utente `Mi serve X`.
 
 ## Fonti Google da ricontrollare prima dell'uso
 
@@ -255,6 +256,4 @@ Registrare ogni test con ipotesi, segmento, campagna, periodo, cambiamenti, metr
 - [Performance Max campaigns](https://support.google.com/google-ads/answer/10724817)
 - [Keyword matching](https://support.google.com/google-ads/answer/14996023)
 - [Negative keywords](https://support.google.com/google-ads/answer/2453972)
-
-
 
