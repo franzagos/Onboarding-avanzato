@@ -1,0 +1,19 @@
+meta:
+  brand: ""
+  audited_at: "YYYY-MM-DD"
+  status: "draft"
+assets:
+  - asset_id: "AS-000"
+    path_or_url: ""
+    media_type: "image|video|audio|copy|3d"
+    product_ids: []
+    markets: []
+    funnel_stages: []
+    placements: []
+    rights_status: "unknown"
+    expires_at: null
+    technical_specs: {}
+    message_tags: []
+    performance_refs: []
+    status: "blocked_unknown_rights"
+

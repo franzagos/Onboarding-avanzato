@@ -1,0 +1,19 @@
+meta:
+  brand: ""
+  observed_at: "YYYY-MM-DD"
+  status: "draft"
+evidence: []
+claims:
+  - claim_id: "CL-000"
+    text_max: ""
+    subject_scope: ""
+    market: ""
+    evidence_ids: []
+    source_url: ""
+    status: "blocked"
+    qualification: null
+    owner: null
+    approved_at: null
+    expires_at: null
+    prohibited_variants: []
+

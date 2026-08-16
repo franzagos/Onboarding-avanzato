@@ -1,0 +1,28 @@
+meta:
+  brand: ""
+  observed_at: "YYYY-MM-DD"
+  status: "draft"
+products:
+  - product_id: ""
+    name: ""
+    family_id: ""
+    variant: null
+    market: ""
+    currency: "EUR"
+    price: null
+    price_observed_at: null
+    stock_status: "unknown"
+    commercial_role: "unknown"
+    role_status: "missing"
+    jobs: []
+    persona_ids: []
+    primary_features: []
+    risk_reducers: []
+    desire_drivers: []
+    objections: []
+    landing_url: null
+    margin_band: null
+    campaign_status: "blocked_missing_input"
+    evidence_ids: []
+offers: []
+

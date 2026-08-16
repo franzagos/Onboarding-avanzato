@@ -1,0 +1,5 @@
+interface:
+  display_name: "Loop Agentic KB"
+  short_description: "Genera KB operative per ADV e creatività"
+  default_prompt: "Usa $loop-agentic-kb per creare una knowledge base completa e agent-ready per questo brand."
+

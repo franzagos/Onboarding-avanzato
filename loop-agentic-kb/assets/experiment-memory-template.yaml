@@ -1,0 +1,25 @@
+meta:
+  brand: ""
+  updated_at: "YYYY-MM-DD"
+experiments:
+  - experiment_id: "EXP-000"
+    hypothesis: ""
+    market: ""
+    channel: ""
+    product_ids: []
+    persona_ids: []
+    awareness_stage: ""
+    variable_tested: ""
+    control: ""
+    variant: ""
+    start_date: null
+    end_date: null
+    primary_metric: ""
+    result: null
+    sample_context: null
+    decision: "planned"
+    learning: null
+    limitations: []
+    reusable_when: []
+    do_not_generalize_to: []
+
