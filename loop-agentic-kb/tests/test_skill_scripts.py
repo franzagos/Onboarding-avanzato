@@ -29,7 +29,7 @@ class SkillScriptTests(unittest.TestCase):
             capture_output=True,
         )
 
-    def test_init_creates_canonical_v2(self) -> None:
+    def test_init_creates_canonical_v21(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             target = Path(directory)
             result = self.init_kb(target)
@@ -37,8 +37,9 @@ class SkillScriptTests(unittest.TestCase):
             self.assertTrue((target / "13-funnel-awareness-matrix.yaml").exists())
             self.assertTrue((target / "sources.yaml").exists())
             self.assertTrue((target / "evidence-ledger.yaml").exists())
+            self.assertTrue((target / "brand-database.yaml").exists())
             self.assertFalse((target / "13-funnel-awareness-matrix.md").exists())
-            self.assertIn('schema_version: "2.0"', (target / "sources.yaml").read_text())
+            self.assertIn('schema_version: "2.1"', (target / "sources.yaml").read_text())
 
     def test_second_init_skips_existing_files(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -46,7 +47,7 @@ class SkillScriptTests(unittest.TestCase):
             self.init_kb(target)
             second = self.init_kb(target)
             self.assertEqual(second.returncode, 0)
-            self.assertIn("Skipped existing (28)", second.stdout)
+            self.assertIn("Skipped existing (29)", second.stdout)
 
     def test_draft_warns_and_review_fails_on_placeholders(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -78,6 +79,23 @@ class SkillScriptTests(unittest.TestCase):
             result = self.validate(target, "draft")
             self.assertEqual(result.returncode, 1)
             self.assertIn("request_text must start with 'Mi serve '", result.stdout)
+
+    def test_yaml_modules_have_standalone_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory)
+            self.init_kb(target)
+            funnel = (target / "13-funnel-awareness-matrix.yaml").read_text()
+            self.assertIn("standalone_context:", funnel)
+            self.assertIn("module_quality:", funnel)
+            self.assertIn('standalone_usability: "fail"', funnel)
+
+    def test_review_rejects_non_passing_module_quality(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory)
+            self.init_kb(target)
+            result = self.validate(target, "review")
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("module_quality.overall must be pass", result.stdout)
 
 
 if __name__ == "__main__":

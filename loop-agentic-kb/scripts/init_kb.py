@@ -33,6 +33,7 @@ TEMPLATE_FILES = {
     "sources.yaml": "sources-template.yaml",
     "evidence-ledger.yaml": "evidence-ledger-template.yaml",
     "assumptions-and-gaps.yaml": "assumptions-gaps-template.yaml",
+    "brand-database.yaml": "brand-database-template.yaml",
 }
 
 GENERIC_YAML = {
@@ -43,7 +44,7 @@ GENERIC_YAML = {
     "20-measurement-framework.yaml": "objectives: []\nmetrics: []\nevents: []\n",
     "context-pack.yaml": "generated_from: []\nentity_ids: {}\n",
     "review-checklist.yaml": "review_items: []\n",
-    "qa-report.yaml": "issues: []\nvalidation_summary: null\n",
+    "qa-report.yaml": "issues: []\nmodule_assessments: []\nvalidation_summary: null\n",
 }
 
 
@@ -64,7 +65,7 @@ def meta(brand_id: str, today: str, source_of_truth: bool = False) -> str:
     truth = "true" if source_of_truth else "false"
     return (
         "meta:\n"
-        '  schema_version: "2.0"\n'
+        '  schema_version: "2.1"\n'
         f'  brand_id: "{brand_id}"\n'
         f'  generated_at: "{today}"\n'
         "  last_reviewed_at: null\n"
@@ -73,10 +74,40 @@ def meta(brand_id: str, today: str, source_of_truth: bool = False) -> str:
     )
 
 
+def standalone(brand_id: str, today: str) -> str:
+    return (
+        "standalone_context:\n"
+        f'  brand_summary: "{brand_id}"\n'
+        "  scope: []\n"
+        "  markets: []\n"
+        "  languages: []\n"
+        f'  as_of: "{today}"\n'
+        "  decisions_supported: []\n"
+        "  allowed_uses: []\n"
+        "  prohibited_uses: []\n"
+        "  positioning_summary: null\n"
+        "  relevant_family_ids: []\n"
+        "  relevant_persona_ids: []\n"
+        "  essential_evidence_ids: []\n"
+        "  definitions: {}\n"
+        "  limitations: []\n"
+        "  blocking_input_ids: []\n"
+        "module_quality:\n"
+        '  coverage: "fail"\n'
+        '  evidence: "fail"\n'
+        '  depth: "fail"\n'
+        '  actionability: "fail"\n'
+        '  standalone_usability: "fail"\n'
+        '  consistency: "fail"\n'
+        '  freshness: "fail"\n'
+        '  overall: "fail"\n'
+    )
+
+
 def markdown(brand: str, brand_id: str, module_id: str, title: str, today: str) -> str:
     return (
         "---\n"
-        'schema_version: "2.0"\n'
+        'schema_version: "2.1"\n'
         f'module_id: "MOD-{module_id.lower()}"\n'
         f'brand_id: "{brand_id}"\n'
         f'generated_at: "{today}"\n'
@@ -84,15 +115,28 @@ def markdown(brand: str, brand_id: str, module_id: str, title: str, today: str) 
         "source_ids: []\n"
         "evidence_ids: []\n"
         "blocking_input_ids: []\n"
+        "module_quality:\n"
+        '  coverage: "fail"\n'
+        '  evidence: "fail"\n'
+        '  depth: "fail"\n'
+        '  actionability: "fail"\n'
+        '  standalone_usability: "fail"\n'
+        '  consistency: "fail"\n'
+        '  freshness: "fail"\n'
+        '  overall: "fail"\n'
         "---\n\n"
         f"# {module_id} — {brand}: {title}\n\n"
+        "## Executive summary\n\nDa compilare.\n\n"
         "## Scopo e decisione supportata\n\nDa compilare.\n\n"
+        "## Contesto autonomo\n\nDa compilare.\n\n"
+        "## Metodologia e coverage\n\nDa compilare.\n\n"
         "## Stato e readiness\n\nDa compilare.\n\n"
         "## Risultati\n\nDa compilare.\n\n"
         "## Evidenze\n\nDa compilare.\n\n"
         "## Inferenze e ipotesi\n\nDa compilare.\n\n"
         "## Gap e input bloccanti\n\nDa compilare.\n\n"
-        "## Implicazioni e handoff\n\nDa compilare.\n"
+        "## Implicazioni e handoff\n\nDa compilare.\n\n"
+        "## Quality gate\n\nDa compilare.\n"
     )
 
 
@@ -125,7 +169,7 @@ def main() -> int:
         emit(filename, content)
 
     for filename, body in GENERIC_YAML.items():
-        emit(filename, meta(brand_id, today) + body)
+        emit(filename, meta(brand_id, today) + standalone(brand_id, today) + body)
 
     print(f"KB skeleton: {root}")
     print(f"Created ({len(created)}): {', '.join(created) if created else 'none'}")

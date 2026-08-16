@@ -1,8 +1,33 @@
 meta:
-  schema_version: "2.0"
+  schema_version: "2.1"
   brand_id: "{{BRAND_ID}}"
   generated_at: "{{DATE}}"
   last_reviewed_at: null
   status: "draft"
   source_of_truth: true
+standalone_context:
+  brand_summary: "{{BRAND_ID}}"
+  scope: ["experiments", "learnings"]
+  markets: []
+  languages: []
+  as_of: "{{DATE}}"
+  decisions_supported: []
+  allowed_uses: []
+  prohibited_uses: []
+  positioning_summary: null
+  relevant_family_ids: []
+  relevant_persona_ids: []
+  essential_evidence_ids: []
+  definitions: {}
+  limitations: []
+  blocking_input_ids: []
+module_quality:
+  coverage: "fail"
+  evidence: "fail"
+  depth: "fail"
+  actionability: "fail"
+  standalone_usability: "fail"
+  consistency: "fail"
+  freshness: "fail"
+  overall: "fail"
 experiments: []

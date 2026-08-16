@@ -4,6 +4,8 @@
 
 Questo modulo trasforma una Brand KB in istruzioni eseguibili per agenti Google Ads. Non propone budget, CPC, volumi o performance senza dati. Se Search Console, Keyword Planner, Merchant Center o account Google Ads non sono disponibili, keyword, priorità e struttura restano **ipotesi da validare**.
 
+Il file deve restare completo e autonomo anche quando le metriche sono mancanti: includere contesto brand/prodotto, metodologia, universo degli intenti, architettura, message pack, landing, feed/PMax, measurement, roadmap e limiti. Un elenco di keyword esemplificative e una readiness checklist non costituiscono un Google Ads Playbook completo.
+
 ## Input obbligatori
 
 - mercato, lingua e valuta;
@@ -62,13 +64,17 @@ Per ogni cluster registrare:
 
 ```yaml
 intent_cluster:
-  id: product_named
+  intent_id: "INT-product-named"
   query_examples: []
   status: hypothesis
   commercial_intent: high|medium|low|unknown
-  product_scope: []
-  landing_page: null
-  proof_required: []
+  product_ids: []
+  persona_ids: []
+  awareness_stage: null
+  jobs: []
+  landing_page_id: null
+  claim_ids: []
+  proof_evidence_ids: []
   exclusions: []
   validation_sources: [keyword_planner, search_console, search_terms]
 ```
@@ -113,19 +119,23 @@ Separare Brand da Non-brand per leggere domanda catturata e domanda incrementale
 - copy senza claim non approvati;
 - negative cross-cluster dove servono.
 
+Produrre una campaign map con ID per campagna e ad group, scopo, intent IDs, product scope, landing, bidding prerequisites, exclusions e criterio di espansione. Coprire ogni famiglia prioritaria nei cluster pertinenti o motivare l'esclusione.
+
 ### 5. Generare annunci
 
 Per ogni gruppo produrre un message pack, non solo headline:
 
 ```yaml
 ad_group_message:
-  intent: ""
-  product_scope: []
+  intent_id: null
+  product_ids: []
+  persona_ids: []
   user_question: ""
   promise: ""
-  proof: []
+  claim_ids: []
+  proof_evidence_ids: []
   risk_reducer: ""
-  landing_page: ""
+  landing_page_id: null
   headline_concepts: []
   description_concepts: []
   assets: [sitelink, callout, structured_snippet, image]
@@ -214,6 +224,19 @@ Regole:
 - query tecnica → PDP/FAQ che risponde direttamente;
 - B2B → pagina contract; se manca, non usare homepage come sostituto silenzioso.
 
+### 8b. Analisi competitiva e SERP
+
+Per ogni cluster prioritario osservare, quando possibile e autorizzato:
+
+- tipologia di risultati e search features;
+- brand, retailer e marketplace ricorrenti;
+- tipo di landing e proof esposte;
+- price/offer presentation senza dedurre volumi;
+- ambiguità semantiche e rischio di query waste;
+- gap fra promessa della query e pagina disponibile.
+
+Separare competitor business da competitor in asta/SEO: possono non coincidere.
+
 ### 9. Measurement e memoria
 
 Minimo:
@@ -230,11 +253,13 @@ Registrare ogni test con ipotesi, segmento, campagna, periodo, cambiamenti, metr
 
 ## Output obbligatori del modulo
 
-1. `google-ads-playbook.md`: strategia applicata al brand.
+1. `16-google-ads-playbook.md`: strategia applicata al brand e contesto autonomo.
 2. `17-landing-page-map.yaml`: intento → pagina → proof → gap.
 3. `keyword-hypotheses.csv|yaml`: opzionale, solo se richiesto.
 4. `feed-readiness.md`: può essere incluso nel playbook.
 5. `sources-and-assumptions`: fonti, data, status e gap.
+
+Il playbook deve inoltre includere coverage report: famiglie/prodotti in scope, cluster generati, landing mappate, esclusioni, dati query disponibili/mancanti e freshness.
 
 ## Quality gate finale
 
@@ -249,6 +274,9 @@ Registrare ogni test con ipotesi, segmento, campagna, periodo, cambiamenti, metr
 - [ ] Tracking e checkout sono testati prima del lancio.
 - [ ] PMax non nasconde categorie con economics incompatibili.
 - [ ] Ogni blocker launch/publish ha un `INP-*` e una richiesta utente `Mi serve X`.
+- [ ] Ogni famiglia prioritaria è coperta da intenti e message pack o ha un'esclusione motivata.
+- [ ] Il file contiene contesto autonomo, metodologia, coverage, conclusioni e next actions.
+- [ ] `module_quality.overall` non è `pass` se il documento è soltanto un framework esplorativo generico.
 
 ## Fonti Google da ricontrollare prima dell'uso
 
@@ -256,4 +284,3 @@ Registrare ogni test con ipotesi, segmento, campagna, periodo, cambiamenti, metr
 - [Performance Max campaigns](https://support.google.com/google-ads/answer/10724817)
 - [Keyword matching](https://support.google.com/google-ads/answer/14996023)
 - [Negative keywords](https://support.google.com/google-ads/answer/2453972)
-

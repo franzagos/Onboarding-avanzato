@@ -34,6 +34,9 @@ Il sorgente completo è disponibile nella cartella [`loop-agentic-kb/`](loop-age
 - richiesta esplicita degli input realmente bloccanti con la formula `Mi serve X`;
 - prosecuzione dei rami non bloccati, senza trasformare un draft in output launch-ready;
 - source/evidence ledger canonici, ID stabili e controllo dei riferimenti orfani.
+- `brand-database.yaml` come entry point unico della fonte di verità;
+- ogni modulo come vista autonoma con contesto, coverage, prove, conclusioni e next action;
+- gate separati per completezza sostanziale e readiness di attivazione.
 
 ## Come gestisce i dati mancanti
 
@@ -44,6 +47,20 @@ Mi serve il mercato e la lingua. Senza questo non posso validare prezzi, policy,
 ```
 
 Se il dato non è disponibile, la Skill propone un output ridotto, conserva il blocker e non lo presenta come equivalente a un deliverable pronto all'attivazione.
+
+## Standard di completezza
+
+La Skill non considera completo un file che contiene soltanto checklist, framework o pochi esempi. Ogni modulo deve superare sette controlli:
+
+- coverage;
+- evidence;
+- depth;
+- actionability;
+- standalone usability;
+- consistency;
+- freshness.
+
+Product intelligence, psicografia, Meta Ads e Google Ads hanno contratti di profondità dedicati. Un modulo può essere strategicamente completo ma ancora bloccato per il lancio: le due cose vengono dichiarate separatamente.
 
 ## Utilizzo
 

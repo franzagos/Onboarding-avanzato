@@ -31,6 +31,7 @@ task:
   completion:
     required_sections: []
     validation_schema: "references/schemas/<schema>.yaml"
+    standalone_contract: "references/standalone-completeness.md"
   missing_input_policy:
     classify_with: "references/blocking-input-protocol.md"
     user_contact_owner: "orchestrator"
@@ -62,6 +63,8 @@ handoff:
   validation:
     schema: "pass"
     evidence: "pass"
+    standalone: "pass"
+    coverage: "pass"
     self_check: "pass"
 ```
 
@@ -272,8 +275,8 @@ review_corpus:
 
 **Output di proprietà**
 
-- `personas.md`;
-- `psychographics.md`;
+- `04-personas.md`;
+- `05-psychographics.md`;
 - `audience-model.yaml`;
 - `hypotheses.yaml`.
 
@@ -295,7 +298,33 @@ persona:
   validation_tests: []
 ```
 
-**Regole:** vietati età, genere, reddito, professione e frequenza se non provati. Preferire jobs, occasioni, rischi e criteri decisionali.
+**Psychographic bridge minimo**
+
+```yaml
+psychographic_bridge:
+  tension_id: "TEN-..."
+  persona_id: "PER-..."
+  family_id: "FAM-..."
+  job: "..."
+  current_identity: "..."
+  desired_identity: "..."
+  private_fear: "..."
+  social_or_aesthetic_risk: "..."
+  rejected_compromise: "..."
+  functional_desire: "..."
+  emotional_desire: "..."
+  social_desire: "..."
+  triggers: []
+  anti_triggers: []
+  alternatives_rejected: []
+  proof_threshold: []
+  product_mechanism: "..."
+  evidence_ids: []
+  confidence: "moderate"
+  validation_tests: []
+```
+
+**Regole:** vietati età, genere, reddito, professione e frequenza se non provati. Preferire jobs, occasioni, rischi e criteri decisionali. Coprire tutte le coppie persona×famiglia prioritarie; aggettivi generici non sostituiscono identità, paura, trade-off, trigger, proof e falsificazione. Leggere `customer-product-intelligence.md`.
 
 ### A5 — Friction & Funnel Analyst
 
@@ -306,8 +335,8 @@ persona:
 
 **Output di proprietà**
 
-- `pain-points.md`;
-- `funnel-awareness-matrix.md`;
+- `06-pain-points.md`;
+- `13-funnel-awareness-matrix.yaml`;
 - `frictions.yaml`.
 
 **Pain schema minimo**
@@ -339,8 +368,8 @@ friction:
 
 **Output di proprietà**
 
-- `product-offer-registry.yaml`;
-- `claims-proof-library.yaml`;
+- `11-product-offer-registry.yaml`;
+- `12-claims-proof-library.yaml`;
 - `claims-gaps.yaml`.
 
 **Claim governance schema minimo**
@@ -362,7 +391,7 @@ ad_claim:
   forbidden_variants: []
 ```
 
-**Regole:** fatti osservati non equivalgono ad approvazione legale/brand; `bestseller`, `limited`, sostenibilità, qualità, durata e superiorità richiedono prova specifica.
+**Regole:** fatti osservati non equivalgono ad approvazione legale/brand; `bestseller`, `limited`, sostenibilità, qualità, durata e superiorità richiedono prova specifica. Il registry deve dichiarare catalog coverage e analizzare prodotti/famiglie in profondità; un campione di SKU non può essere consegnato come database completo.
 
 ### A7 — Creative Activation Analyst
 
@@ -398,7 +427,7 @@ creative_angle:
   prohibited_claim_ids: []
 ```
 
-**Regole:** angolo creativo ≠ copy approvato; un hook deve risalire a pain/tensione e prova; humor disattivato nei contesti di incidente e assistenza.
+**Regole:** angolo creativo ≠ copy approvato; un hook deve risalire a pain/tensione e prova; humor disattivato nei contesti di incidente e assistenza. Il Meta brief deve contenere analisi completa di ruolo canale, funnel, audience hypotheses, route, placement, asset, landing, test e measurement anche quando l'attivazione è bloccata.
 
 ### A8 — Search & Landing Analyst
 
@@ -430,7 +459,7 @@ search_intent:
   source_ids: []
 ```
 
-**Regole:** mai inventare volume, CPC o domanda; competitor terms richiedono review legale/policy; distinguere pagina esistente da landing proposta.
+**Regole:** mai inventare volume, CPC o domanda; competitor terms richiedono review legale/policy; distinguere pagina esistente da landing proposta. Coprire ogni famiglia prioritaria con intenti, campaign/ad-group map, message pack e landing oppure motivarne l'esclusione. Il playbook deve essere autonomo e non ridursi a keyword esemplificative.
 
 ### A9 — Asset & Market Readiness Analyst
 
@@ -520,6 +549,8 @@ qa_issue:
 
 Il reviewer non riscrive il package. L'orchestratore applica fix mirati e registra l'esito.
 
+Il reviewer esegue anche il test in isolamento di `standalone-completeness.md`: riceve un file alla volta senza altri moduli e valuta coverage, evidence, depth, actionability, standalone usability, consistency e freshness. Un modulo con readiness bloccata può superare il test strategico; un modulo superficiale non può superarlo soltanto perché elenca correttamente i blocker.
+
 ## Handoff tra agenti
 
 1. Un agente conclude scrivendo file completi e un `handoff.yaml`.
@@ -562,5 +593,7 @@ Un task è `complete` quando:
 - unknown e blocchi sono espliciti;
 - non sono stati toccati file fuori write scope;
 - l'handoff indica ciò che il downstream può e non può usare.
+- ogni file ha `module_quality.overall: pass` e supera il test in isolamento;
+- coverage universe, inclusioni ed esclusioni sono dichiarati.
 
 È `degraded` quando l'output è utile ma una fonte o sezione non critica manca. È `blocked` solo quando non può produrre nemmeno un artefatto strutturale affidabile.

@@ -1,6 +1,6 @@
 ---
 name: loop-agentic-kb
-description: "Genera, aggiorna e valida knowledge base e-commerce agent-ready per brand onboarding, product intelligence, competitor, personas, psicografia, recensioni/VOC, Brand Voice, Tone of Voice, lessico, ADV, creative strategy, Google Ads, landing page mapping, market packs, measurement ed experiment memory. Usare quando Codex deve trasformare un sito e materiali interni in una fonte di verità riutilizzabile da più agenti, creare brief channel-ready senza inventare dati, oppure orchestrare analisi specialistiche in parallelo."
+description: "Genera, aggiorna e valida database di brand e-commerce profondi, evidence-first e agent-ready, con moduli autonomamente utilizzabili per onboarding, prodotti, competitor, personas, psicografia, recensioni/VOC, Brand Voice, Tone of Voice, lessico, Meta Ads, creative strategy, Google Ads, landing, mercati, measurement ed experiment memory. Usare quando Codex deve trasformare sito e materiali interni in un'unica fonte di verità riutilizzabile, creare analisi complete per singolo modulo, oppure orchestrare specialisti senza inventare dati."
 ---
 
 # Loop Agentic KB
@@ -17,9 +17,13 @@ Costruire una KB operativa che separi identità stabile, decisioni di mercato, d
 - Non dichiarare `campaign-ready` senza prodotto/offerta, mercato, target, obiettivo, destinazione, proof ed economics minimi.
 - Mantenere i moduli brand-neutral separati dai market pack e dai campaign brief.
 - Conservare output validi esistenti; aggiornare solo moduli obsoleti o insufficienti.
+- Trattare la KB come un database normalizzato: una sola autorità per ogni entità, nessuna verità concorrente.
+- Rendere ogni file una vista materializzata autonoma: deve essere comprensibile e azionabile senza aprire altri file, pur referenziando gli ID canonici.
+- Non dichiarare completo un modulo che contiene soltanto framework, checklist, pochi esempi o una selezione non dichiarata.
 
 Leggere sempre [evidence-governance.md](references/evidence-governance.md). Leggere [module-contracts.md](references/module-contracts.md) prima di creare file e [agent-contracts.md](references/agent-contracts.md) prima di delegare.
 Leggere [blocking-input-protocol.md](references/blocking-input-protocol.md) durante l'intake e prima di ogni readiness gate. Leggere [canonical-schema.md](references/canonical-schema.md) prima di assegnare ID o creare registri YAML.
+Leggere sempre [standalone-completeness.md](references/standalone-completeness.md) prima della ricerca e durante il QA. Leggere [customer-product-intelligence.md](references/customer-product-intelligence.md) per Product Message Map, prodotti, personas, psicografia, pain point e VOC.
 
 ## Intake
 
@@ -63,13 +67,30 @@ Produrre moduli 01–10, fonti, gap e context pack.
 
 Produrre moduli 00–21. I moduli 11–21 possono contenere campi mancanti espliciti: la completezza strutturale non equivale a campaign readiness.
 
+Usare profondità `deep` come default per una KB completa. Usare `lean` o campionamento soltanto se l'utente lo chiede esplicitamente o se un limite tecnico viene dichiarato; in quel caso marcare i moduli interessati `module_quality.overall: conditional|fail`, mai completi.
+
 ### Channel pack
 
 Aggiornare soltanto il brief del canale e le sue dipendenze. Per ADV/creative leggere [adv-creative-playbook.md](references/adv-creative-playbook.md). Per Google leggere [google-ads-playbook.md](references/google-ads-playbook.md).
 
 ### Market pack
 
-Creare `markets/<country-code>.md`; non riscrivere la KB centrale con conclusioni locali.
+Creare `19-market-packs/<country-code>.md`; non riscrivere la KB centrale con conclusioni locali.
+
+## Database e viste autonome
+
+Creare `brand-database.yaml` come indice canonico del database: versione, moduli, autorità, entity IDs, dipendenze, freshness e readiness. Non duplicare al suo interno tutti i record.
+
+Ogni modulo deve incorporare un `standalone_context` o una sezione `Contesto autonomo` generata dalle autorità canoniche, contenente almeno:
+
+- brand, scope, mercato/lingua e data;
+- decisioni supportate e usi consentiti/vietati;
+- sintesi di posizionamento, portfolio e audience rilevanti per il modulo;
+- definizione degli ID referenziati;
+- prove essenziali con fonte/data;
+- limiti, blocker e freshness.
+
+Il contesto incorporato è una vista derivata: aggiornarlo rigenerando il modulo, non modificandolo come fonte indipendente.
 
 ## Orchestrazione multi-agent
 
@@ -132,12 +153,23 @@ sources.yaml
 evidence-ledger.yaml
 assumptions-and-gaps.yaml
 context-pack.yaml
+brand-database.yaml
 strategic-summary.md
 review-checklist.yaml
 qa-report.yaml
 ```
 
-Questi nomi sono canonici. Non produrre alias legacy come `01a`, `07a`, `07b` o numerazioni alternative. I Markdown devono usare nel titolo lo stesso numero del filename. `sources.yaml`, `evidence-ledger.yaml` e `12-claims-proof-library.yaml` sono le autorità rispettivamente per fonti, prove e pubblicabilità dei claim; gli altri moduli li referenziano tramite ID e non ne duplicano il contenuto.
+Questi nomi sono canonici. Non produrre alias legacy come `01a`, `07a`, `07b` o numerazioni alternative. I Markdown devono usare nel titolo lo stesso numero del filename. `brand-database.yaml` è l'indice; `sources.yaml`, `evidence-ledger.yaml`, `11-product-offer-registry.yaml`, `12-claims-proof-library.yaml` e `18-asset-library.yaml` sono autorità normalizzate. Gli altri moduli sono viste autonome derivate e referenziano gli ID canonici.
+
+## Completezza sostanziale
+
+Separare sempre:
+
+- `module_completeness`: il file copre integralmente il proprio scopo;
+- `standalone_ready`: il file può essere usato da solo;
+- readiness di attivazione/pubblicazione.
+
+Un modulo può essere completo e standalone per strategia, ma avere `activation_ready: blocked`. Non può essere `module_completeness: pass` se mancano sezioni, copertura, fonti o ragionamento necessari alla sua funzione. Applicare tutti i gate in [standalone-completeness.md](references/standalone-completeness.md).
 
 ## Moduli commerciali strutturati
 
@@ -218,3 +250,5 @@ Ogni stato deve includere `status`, `blocking_input_ids`, `conditions` e `last_c
 - Contraddizioni tra fonti sono conservate e risolte esplicitamente.
 - `validate_kb.py` termina senza errori strutturali.
 - Un revisore può usare la KB senza ricostruire il contesto dalla chat.
+- Ogni modulo supera il test in isolamento: il reviewer riceve soltanto quel file e riesce a comprendere brand, evidenze, analisi, decisioni, limiti e next action.
+- `qa-report.yaml` contiene un assessment per ogni file su coverage, evidence, depth, actionability, standalone usability, consistency e freshness.

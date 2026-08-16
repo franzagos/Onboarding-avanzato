@@ -13,7 +13,10 @@
 
 Ogni modulo Markdown deve contenere:
 
+- executive summary e conclusioni prioritarie;
 - scopo e decisione supportata;
+- contesto autonomo: brand, scope, mercato/data, entità rilevanti e usi consentiti;
+- metodologia e coverage;
 - stato/readiness;
 - risultati;
 - evidenze con fonte e data;
@@ -22,9 +25,11 @@ Ogni modulo Markdown deve contenere:
 - implicazioni;
 - handoff al modulo successivo.
 
-Ogni YAML deve usare ID stabili, stringhe quotate quando ambigue, `null` per dati mancanti e stato esplicito.
+Il file deve essere utilizzabile senza aprire dipendenze. Includere una vista compatta delle entità e prove necessarie, generata dalle autorità canoniche. Non usare rinvii come sostituto dell'analisi.
 
-Ogni file deve dichiarare `schema_version: "2.0"`. Usare esclusivamente nomi, ID, vocabolari e readiness definiti in `canonical-schema.md`. Ogni modulo deve elencare `blocking_input_ids`; se non ne ha, usare `[]`.
+Ogni YAML deve usare ID stabili, stringhe quotate quando ambigue, `null` per dati mancanti e stato esplicito. Deve contenere `standalone_context` e `module_quality` secondo `standalone-completeness.md`.
+
+Ogni file deve dichiarare `schema_version: "2.1"`. Usare esclusivamente nomi, ID, vocabolari e readiness definiti in `canonical-schema.md`. Ogni modulo deve elencare `blocking_input_ids`; se non ne ha, usare `[]`.
 
 ## Moduli foundation
 
@@ -73,13 +78,15 @@ Ogni file deve dichiarare `schema_version: "2.0"`. Usare esclusivamente nomi, ID
 ```yaml
 module: ""
 producer: ""
-status: "complete|partial|blocked"
+status: "complete|degraded|blocked"
 inputs_used: []
 outputs_created: []
 evidence_ids: []
 decisions: []
 hypotheses: []
 blocking_gaps: []
+module_quality: {}
+standalone_test: "pass|fail"
 downstream_ready_for: []
 do_not_assume: []
 ```
@@ -94,7 +101,16 @@ L'orchestratore deve rifiutare un handoff che non distingue decisioni, ipotesi e
 | `evidence-ledger.yaml` | record `EV-*` |
 | `assumptions-and-gaps.yaml` | assunzioni, gap e `INP-*` |
 | `context-pack.yaml` | indice compatto per ID, senza duplicare record canonici |
+| `brand-database.yaml` | entry point unico: versione, autorità, moduli, entity index, freshness e readiness |
 | `review-checklist.yaml` | decisioni umane con owner, due date e pass/fail |
 | `qa-report.yaml` | errori atomici `QA-*` e gate finali |
 
 Se un input bloccante emerge, applicare `blocking-input-protocol.md` prima di dichiarare completo il modulo interessato.
+
+## Completezza e readiness sono assi separati
+
+`module_quality.overall` misura completezza sostanziale e autonomia. La readiness misura se il modulo può sostenere onboarding, strategia, attivazione o pubblicazione. Un Meta brief può avere analisi strategica completa ma `activation_ready: blocked`; non può avere `module_quality.overall: pass` se contiene soltanto un intake e una lista di dati mancanti.
+
+Quando si aggiorna una KB precedente, i file legacy sono input, non output alternativi. Generare il filename canonico, migrare gli ID con alias tracciati e valutare nuovamente la qualità delle dipendenze prima di usarle.
+
+Ogni modulo deve documentare universo, copertura, esclusioni e metodo. Usare `complete` soltanto quando supera il contratto specifico in `standalone-completeness.md`.

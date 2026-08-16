@@ -19,7 +19,7 @@ FULL_REQUIRED = [
     "18-asset-library.yaml", "19-market-packs", "20-measurement-framework.yaml",
     "21-experiment-memory.yaml", "sources.yaml", "evidence-ledger.yaml",
     "assumptions-and-gaps.yaml", "context-pack.yaml", "strategic-summary.md",
-    "review-checklist.yaml", "qa-report.yaml",
+    "brand-database.yaml", "review-checklist.yaml", "qa-report.yaml",
 ]
 
 NUCLEUS_REQUIRED = [
@@ -28,7 +28,7 @@ NUCLEUS_REQUIRED = [
     "16-google-ads-playbook.md", "17-landing-page-map.yaml",
     "18-asset-library.yaml", "20-measurement-framework.yaml",
     "sources.yaml", "evidence-ledger.yaml", "assumptions-and-gaps.yaml",
-    "context-pack.yaml", "qa-report.yaml",
+    "context-pack.yaml", "brand-database.yaml", "qa-report.yaml",
 ]
 
 EXPECTED_ROOTS = {
@@ -46,7 +46,8 @@ EXPECTED_ROOTS = {
     "assumptions-and-gaps.yaml": ["assumptions:", "gaps:", "missing_inputs:"],
     "context-pack.yaml": ["generated_from:", "entity_ids:"],
     "review-checklist.yaml": ["review_items:"],
-    "qa-report.yaml": ["issues:", "validation_summary:"],
+    "brand-database.yaml": ["database:"],
+    "qa-report.yaml": ["issues:", "module_assessments:", "validation_summary:"],
 }
 
 LEGACY_FILES = {
@@ -161,11 +162,30 @@ def main() -> int:
         if relative.endswith(".yaml"):
             if not top_level_key_exists(text, "meta:"):
                 errors.append(f"{relative}: missing meta root")
-            if not re.search(r'(?m)^\s+schema_version:\s*["\']2\.0["\']?\s*$', text):
-                errors.append(f"{relative}: missing schema_version 2.0")
+            if not re.search(r'(?m)^\s+schema_version:\s*["\']2\.1["\']?\s*$', text):
+                errors.append(f"{relative}: missing schema_version 2.1")
             for expected in EXPECTED_ROOTS.get(relative, []):
                 if not top_level_key_exists(text, expected):
                     errors.append(f"{relative}: missing root {expected}")
+            for required_root in ("standalone_context:", "module_quality:"):
+                if not top_level_key_exists(text, required_root):
+                    errors.append(f"{relative}: missing root {required_root}")
+            quality_match = re.search(
+                r'(?ms)^module_quality:\s*\n(.*?)(?=^[A-Za-z_][A-Za-z0-9_]*:|\Z)', text
+            )
+            if quality_match:
+                quality = quality_match.group(1)
+                for dimension in (
+                    "coverage", "evidence", "depth", "actionability",
+                    "standalone_usability", "consistency", "freshness", "overall",
+                ):
+                    status_match = re.search(
+                        rf'(?m)^\s+{dimension}:\s*["\']?(pass|conditional|fail)["\']?\s*$', quality
+                    )
+                    if not status_match:
+                        errors.append(f"{relative}: module_quality missing/invalid {dimension}")
+                    elif args.stage != "draft" and dimension == "overall" and status_match.group(1) != "pass":
+                        errors.append(f"{relative}: module_quality.overall must be pass at {args.stage} stage")
         elif relative in {name for name, _, _ in [
             ("00-agent-manifest.md", "00", ""), ("01-knowledge-base.md", "01", ""),
             ("02-product-message-map.md", "02", ""), ("03-competitors.md", "03", ""),
@@ -174,11 +194,39 @@ def main() -> int:
             ("08-brand-voice.md", "08", ""), ("09-tone-of-voice.md", "09", ""),
             ("10-lexicon.md", "10", ""), ("16-google-ads-playbook.md", "16", ""),
         ]}:
-            if not text.startswith("---\n") or 'schema_version: "2.0"' not in text[:500]:
+            if not text.startswith("---\n") or 'schema_version: "2.1"' not in text[:500]:
                 errors.append(f"{relative}: missing canonical frontmatter")
             expected_number = relative[:2]
             if not re.search(rf"(?m)^# {re.escape(expected_number)} \u2014 ", text):
                 errors.append(f"{relative}: H1 number does not match filename")
+
+    required_markdown_sections = (
+        "## Executive summary", "## Scopo e decisione supportata",
+        "## Contesto autonomo", "## Metodologia e coverage",
+        "## Evidenze", "## Inferenze e ipotesi",
+        "## Gap e input bloccanti", "## Implicazioni e handoff",
+        "## Quality gate",
+    )
+    for relative, text in texts.items():
+        if not relative.endswith(".md"):
+            continue
+        for section in required_markdown_sections:
+            if section not in text:
+                message = f"{relative}: missing standalone section {section}"
+                (warnings if args.stage == "draft" else errors).append(message)
+        frontmatter = text.split("---", 2)[1] if text.startswith("---") and text.count("---") >= 2 else ""
+        if "module_quality:" not in frontmatter:
+            errors.append(f"{relative}: missing module_quality in frontmatter")
+        elif args.stage != "draft" and not re.search(r'(?m)^\s+overall:\s*["\']?pass["\']?\s*$', frontmatter):
+            errors.append(f"{relative}: module_quality.overall must be pass at {args.stage} stage")
+
+    database_text = texts.get("brand-database.yaml", "")
+    for authority in (
+        "sources.yaml", "evidence-ledger.yaml", "11-product-offer-registry.yaml",
+        "12-claims-proof-library.yaml", "18-asset-library.yaml", "21-experiment-memory.yaml",
+    ):
+        if authority not in database_text:
+            errors.append(f"brand-database.yaml: missing authority {authority}")
 
     known: dict[str, set[str]] = {}
     for ref_key, (authority, definition_key, prefix) in AUTHORITIES.items():

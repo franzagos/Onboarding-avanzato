@@ -4,6 +4,8 @@
 
 Usare una riga per prodotto/variante realmente promuovibile. Una famiglia può avere una riga aggregata soltanto se prezzo, stock, proof e landing sono comuni.
 
+Prima di compilare il registry, censire il catalogo con sitemap, collezioni, PDP, feed/listini e materiali disponibili. Dichiarare universo scoperto, copertura, esclusioni e metodo. Quattro prodotti esemplificativi non costituiscono un product database completo.
+
 Campi minimi:
 
 ```yaml
@@ -21,16 +23,28 @@ Campi minimi:
   jobs: []
   persona_ids: []
   primary_features: []
+  functional_benefits: []
+  emotional_social_meanings: []
+  visual_signature: []
+  use_cases: []
   risk_reducers: []
   desire_drivers: []
   objections: []
   landing_url: null
+  alternative_product_ids: []
+  competitor_ids: []
+  cross_sell_product_ids: []
+  upsell_product_ids: []
+  content_opportunities: []
+  operational_risks: []
   margin_band: null
   campaign_status: "blocked_missing_input"
   evidence_ids: []
 ```
 
 Non assegnare ruolo commerciale da bestseller label, homepage prominence o gusto personale senza marcare `inference`.
+
+Produrre una sintesi per famiglia con gamma, price ladder, differenze fra varianti, entry point, upgrade path, cannibalizzazione, proof gaps e rilevanza per personas/jobs. Leggere `customer-product-intelligence.md` per il contratto completo.
 
 ## Offer registry
 

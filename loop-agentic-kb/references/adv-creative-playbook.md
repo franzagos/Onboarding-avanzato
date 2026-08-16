@@ -13,6 +13,8 @@ Il sistema genera tre artefatti distinti:
 
 Questi moduli non sostituiscono la Brand KB. La Brand KB stabilisce cosa è vero; il playbook stabilisce come organizzare ciò che è vero per l'attivazione.
 
+Ogni file deve tuttavia essere autonomo: incorporare il contesto rilevante del brand, definire gli ID consumati e includere l'intera analisi necessaria al proprio uso consentito. Un file Meta composto soltanto da readiness audit e blocker fallisce il gate di completezza.
+
 ## 2. Input minimi
 
 ### Input richiesti dalla Brand KB
@@ -121,6 +123,31 @@ Prima del copy definire:
 
 Per conversione devono essere presenti offerta e azione. Per awareness non forzare scarsità o CTA transazionale. Feed e Reels/Stories richiedono adattamenti, non semplici tagli.
 
+Il Meta brief completo deve includere anche quando il lancio è bloccato:
+
+1. ruolo di Meta nel customer journey e confini rispetto a Search/CRM;
+2. sintesi autonoma di brand, prodotti/famiglie, personas, psicografia e proof;
+3. architettura per prospecting, consideration, retargeting e retention, marcando `not_applicable` dove motivato;
+4. audience hypotheses con fonte logica, esclusioni, sovrapposizioni e metodo di validazione;
+5. route `product × persona × awareness × tension × proof × CTA × landing`;
+6. creative territories e concept collegati a `ANG-*`, non categorie generiche;
+7. hook families, message hierarchy, visual mechanism e proof on screen;
+8. matrice placement/formato con adattamenti Feed, Reels, Stories e catalogo;
+9. offer/landing logic, risk reducers e claim guardrails;
+10. asset inventory/gaps e diritti;
+11. test roadmap con ipotesi, variabile, KPI, guardrail e criterio di decisione;
+12. measurement, attribution assumptions e blocker launch/publish.
+
+La mancanza di economics o tracking blocca l'attivazione, non autorizza a consegnare un file strategico superficiale. La mancanza di prodotto, mercato o obiettivo può invece bloccare il brief richiesto: applicare `Mi serve X` prima di scegliere arbitrariamente.
+
+### Coverage Meta
+
+- coprire ogni famiglia/prodotto prioritario o spiegare l'esclusione;
+- coprire ogni persona/job prioritario con almeno una route completa;
+- coprire tutti gli awareness stage realmente applicabili;
+- collegare ogni concept a claim/proof, asset requirement, placement e landing;
+- separare sempre strategia esplorativa, draft interno, activation-ready e publish-ready.
+
 ### Fase E — QA avversariale
 
 Bloccare l'output se compare uno dei seguenti casi:
@@ -193,23 +220,31 @@ creative_concept:
 
 ```yaml
 meta_brief:
-  schema_version: "2.0"
+  schema_version: "2.1"
+  standalone_context: {}
+  module_quality: {}
   readiness:
     activation_ready: {status: blocked, blocking_input_ids: [], conditions: [], last_checked_at: "YYYY-MM-DD"}
     publish_ready: {status: blocked, blocking_input_ids: [], conditions: [], last_checked_at: "YYYY-MM-DD"}
   market: null
   language: null
-  product: null
-  offer: null
+  product_ids: []
+  offer_ids: []
   stock_verified_at: null
-  audience: null
-  audience_status: null
+  persona_ids: []
+  audience_hypotheses: []
   objective: null
   awareness: problem-aware
   placements: [feed, reels, stories]
   destination_url: null
   approved_claim_ids: []
-  blocked_claims: []
+  blocked_claim_ids: []
+  funnel_architecture: []
+  routes: []
+  angle_ids: []
+  placement_matrix: []
+  asset_requirements: []
+  test_roadmap: []
   economics:
     margin: null
     aov: null
@@ -235,6 +270,8 @@ Usare solo `pass`, `conditional` o `blocked`:
 | Measurement | evento e KPI definiti | tracking da QA | metrica assente |
 
 Non calcolare un punteggio numerico di readiness: maschererebbe la natura bloccante di alcuni campi. Ogni gate bloccato deve avere almeno un `INP-*` in `assumptions-and-gaps.yaml`.
+
+Il quality gate del modulo è separato: `module_quality.overall: pass` richiede coverage, evidence, depth, actionability, standalone usability e consistency tutte `pass`.
 
 ## 10. Regole di aggiornamento
 

@@ -16,6 +16,8 @@ L'architettura evolve l'Onboarding 4.0 esistente: conserva evidence-first, check
 6. Ogni modulo usa il vocabolario canonico `evidence`, `inference`, `hypothesis`, `missing`, `blocked`.
 7. “Campaign-ready” è uno stato verificabile, non una formula editoriale.
 8. Se i sub-agent non sono disponibili, lo stesso DAG viene eseguito in sequenza dall'orchestratore.
+9. Ogni output specialistico deve essere una vista autonoma completa, non un frammento che dipende dalla memoria della chat.
+10. Completezza analitica e readiness di attivazione sono gate separati.
 
 ## Deliverable canonici
 
@@ -47,11 +49,14 @@ sources.yaml
 evidence-ledger.yaml
 assumptions-and-gaps.yaml
 context-pack.yaml
+brand-database.yaml
 review-checklist.yaml
 qa-report.yaml
 ```
 
 Il formato Markdown serve alla lettura umana; YAML serve al consumo da parte di altri agenti. Se un modulo non è applicabile, il file viene comunque creato con `status: not_applicable` e motivazione.
+
+`brand-database.yaml` indicizza autorità, entità, moduli, versioni e freshness. I moduli includono viste autonome derivate con `generated_from`; non diventano autorità concorrenti.
 
 ## Ruoli
 
@@ -153,6 +158,8 @@ L'orchestratore:
 
 **Gate G0:** scope sufficiente, fonti/accessi noti, output path determinato. Classificare gli input mancanti con `blocking-input-protocol.md`. Procedere sui gap `non_blocking`; per un `run_blocking`, chiedere all'utente iniziando con `Mi serve X`; per un `branch_blocking`, completare i rami indipendenti e chiedere prima di entrare nel ramo bloccato.
 
+Per una KB dichiarata completa, impostare `depth: deep`. Una riduzione a `lean` o un campione di prodotti/recensioni/competitor richiede motivazione nel manifest e impedisce il passaggio automatico dei moduli coinvolti.
+
 ### Onda 1 — Foundation parallela
 
 Eseguire in parallelo A1, A2 e A3. Ogni agente riceve lo stesso `run-manifest`, ma solo le fonti e gli output richiesti dal proprio contratto.
@@ -181,6 +188,8 @@ A9 crea market pack solo per i mercati richiesti. Se non ci sono asset allegati,
 
 **Gate G2:** ogni persona ha evidenze e confidence; ogni claim ha stato e perimetro; ogni campo business non pubblico è `unknown`.
 
+In aggiunta, il Product Registry espone catalog coverage e la psicografia copre le coppie persona×famiglia prioritarie con identity stakes, paure, trade-off, trigger, proof threshold e test. Pochi prodotti o tensioni generiche fanno fallire G2.
+
 ### Onda 3 — Activation parallela
 
 Eseguire in parallelo:
@@ -194,6 +203,8 @@ Gli agenti possono generare framework e backlog di test. Possono generare copy p
 **Merge M3:** verificare che tutti gli angoli e le query arrivino a una pagina, un prodotto, una persona, una prova e una fase funnel. Elementi non collegabili sono backlog, non raccomandazioni.
 
 **Gate G3:** nessun hook usa claim bloccati; nessuna keyword è presentata come domanda validata senza dati; nessuna pagina inesistente è descritta come esistente.
+
+In aggiunta, Meta e Google devono superare i contratti di profondità nei rispettivi playbook. Un brief composto da intake, architettura generica e blocker non supera G3.
 
 ### Onda 4 — Measurement e memoria
 
@@ -211,6 +222,8 @@ Il reviewer controlla il pacchetto senza vedere le conclusioni attese. L'orchest
 - assumptions and gaps;
 - governance e refresh schedule;
 - status complessivo: `onboarding-ready`, `strategy-ready`, `creative-ready`, `campaign-ready` o `degraded`.
+
+Il reviewer ripete il controllo con un file alla volta. Compila `module_assessments` in `qa-report.yaml`; nessun file con `standalone_usability: fail` può entrare nel package finale come completo.
 
 ## Regole di parallelizzazione
 
@@ -323,4 +336,6 @@ Il package è consegnabile solo se:
 - non ci sono ID orfani o link interni rotti;
 - gli unknown critici compaiono in `assumptions-and-gaps.yaml` come `INP-*`;
 - readiness e usi vietati sono dichiarati nel manifest.
-
+- ogni modulo dichiara coverage, include contesto autonomo e supera il test in isolamento;
+- `brand-database.yaml` risolve univocamente l'autorità di ogni entità;
+- nessun modulo usa un campione non dichiarato come sostituto dell'universo analizzato.
