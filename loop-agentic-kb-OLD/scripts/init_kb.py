@@ -5,11 +5,25 @@ from __future__ import annotations
 
 import argparse
 from datetime import date
-import json
 from pathlib import Path
 import re
 
-from module_catalog import CORE_FILES, PROFILES, selected_modules
+
+MARKDOWN_MODULES = [
+    ("00-agent-manifest.md", "00", "Agent Manifest"),
+    ("01-knowledge-base.md", "01", "Knowledge Base"),
+    ("02-product-message-map.md", "02", "Product Message Map"),
+    ("03-competitors.md", "03", "Competitors"),
+    ("04-personas.md", "04", "Personas"),
+    ("05-psychographics.md", "05", "Psychographics"),
+    ("06-pain-points.md", "06", "Pain Points"),
+    ("07-reviews-voc.md", "07", "Reviews & Voice of Customer"),
+    ("08-brand-voice.md", "08", "Brand Voice"),
+    ("09-tone-of-voice.md", "09", "Tone of Voice"),
+    ("10-lexicon.md", "10", "Lexicon"),
+    ("16-google-ads-playbook.md", "16", "Google Ads Playbook"),
+    ("strategic-summary.md", "SUMMARY", "Strategic Summary"),
+]
 
 TEMPLATE_FILES = {
     "11-product-offer-registry.yaml": "product-offer-registry-template.yaml",
@@ -130,25 +144,11 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--brand", required=True)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument(
-        "--profile", choices=[*PROFILES, "custom"], default="full",
-        help="Create only the modules required by this workflow.",
-    )
-    parser.add_argument(
-        "--modules", nargs="*",
-        help="Module IDs or canonical filenames; valid only with --profile custom.",
-    )
     args = parser.parse_args()
-
-    try:
-        modules = selected_modules(args.profile, args.modules)
-    except ValueError as error:
-        parser.error(str(error))
 
     root = args.output.expanduser().resolve()
     root.mkdir(parents=True, exist_ok=True)
-    (root / "exports" / "modules").mkdir(parents=True, exist_ok=True)
-    (root / "deliverables").mkdir(exist_ok=True)
+    (root / "19-market-packs").mkdir(exist_ok=True)
 
     today = date.today().isoformat()
     brand_id = slugify(args.brand)
@@ -159,57 +159,19 @@ def main() -> int:
         target = root / relative
         (created if write_new(target, content) else skipped).append(relative)
 
-    assets = Path(__file__).resolve().parent.parent / "assets"
-    for module in modules:
-        filename = module.filename
-        if filename == "19-market-packs":
-            (root / filename).mkdir(exist_ok=True)
-        elif module.is_markdown:
-            emit(filename, markdown(args.brand, brand_id, module.module_id, module.title, today))
-        elif filename in TEMPLATE_FILES:
-            content = (assets / TEMPLATE_FILES[filename]).read_text(encoding="utf-8")
-            content = content.replace("{{BRAND_ID}}", brand_id).replace("{{DATE}}", today)
-            emit(filename, content)
-        else:
-            emit(filename, meta(brand_id, today) + standalone(brand_id, today) + GENERIC_YAML[filename])
+    for filename, module_id, title in MARKDOWN_MODULES:
+        emit(filename, markdown(args.brand, brand_id, module_id, title, today))
 
-    for filename in CORE_FILES:
-        if filename in TEMPLATE_FILES:
-            content = (assets / TEMPLATE_FILES[filename]).read_text(encoding="utf-8")
-            content = content.replace("{{BRAND_ID}}", brand_id).replace("{{DATE}}", today)
-        else:
-            content = meta(brand_id, today) + standalone(brand_id, today) + GENERIC_YAML[filename]
+    assets = Path(__file__).resolve().parent.parent / "assets"
+    for filename, template_name in TEMPLATE_FILES.items():
+        content = (assets / template_name).read_text(encoding="utf-8")
+        content = content.replace("{{BRAND_ID}}", brand_id).replace("{{DATE}}", today)
         emit(filename, content)
 
-    emit("strategic-summary.md", markdown(args.brand, brand_id, "SUMMARY", "Strategic Summary", today))
-    if args.profile in {"activation", "full"}:
-        emit(
-            "review-checklist.yaml",
-            meta(brand_id, today) + standalone(brand_id, today) + GENERIC_YAML["review-checklist.yaml"],
-        )
-
-    manifest = {
-        "schema_version": "1.0",
-        "brand": args.brand,
-        "brand_id": brand_id,
-        "profile": args.profile,
-        "generated_at": today,
-        "modules": [
-            {
-                "id": module.module_id,
-                "source": module.filename,
-                "markdown_export": f"exports/modules/{module.export_filename}"
-                if module.filename != "19-market-packs" else "exports/modules/19-market-packs/",
-            }
-            for module in modules
-        ],
-    }
-    (root / "kb-manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    for filename, body in GENERIC_YAML.items():
+        emit(filename, meta(brand_id, today) + standalone(brand_id, today) + body)
 
     print(f"KB skeleton: {root}")
-    print(f"Profile: {args.profile} ({len(modules)} module(s))")
     print(f"Created ({len(created)}): {', '.join(created) if created else 'none'}")
     print(f"Skipped existing ({len(skipped)}): {', '.join(skipped) if skipped else 'none'}")
     return 0

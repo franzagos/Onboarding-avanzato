@@ -1,29 +1,21 @@
 from __future__ import annotations
 
 from pathlib import Path
-import json
 import subprocess
 import sys
 import tempfile
 import unittest
-import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
 INIT = ROOT / "scripts" / "init_kb.py"
 VALIDATE = ROOT / "scripts" / "validate_kb.py"
-RENDER = ROOT / "scripts" / "render_module.py"
-BUILD = ROOT / "scripts" / "build_final_md.py"
-PACKAGE = ROOT / "scripts" / "package_delivery.py"
 
 
 class SkillScriptTests(unittest.TestCase):
-    def init_kb(self, target: Path, profile: str = "full") -> subprocess.CompletedProcess[str]:
+    def init_kb(self, target: Path) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [
-                sys.executable, str(INIT), "--brand", "Test Brand", "--output", str(target),
-                "--profile", profile,
-            ],
+            [sys.executable, str(INIT), "--brand", "Test Brand", "--output", str(target)],
             check=False,
             text=True,
             capture_output=True,
@@ -104,70 +96,6 @@ class SkillScriptTests(unittest.TestCase):
             result = self.validate(target, "review")
             self.assertEqual(result.returncode, 1)
             self.assertIn("module_quality.overall must be pass", result.stdout)
-
-    def test_onboarding_profile_creates_only_requested_modules(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            target = Path(directory)
-            result = self.init_kb(target, "onboarding")
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertTrue((target / "10-lexicon.md").exists())
-            self.assertFalse((target / "11-product-offer-registry.yaml").exists())
-            manifest = json.loads((target / "kb-manifest.json").read_text())
-            self.assertEqual(manifest["profile"], "onboarding")
-            validation = self.validate(target, "draft")
-            self.assertEqual(validation.returncode, 0, validation.stdout)
-
-    def test_yaml_module_renders_as_standalone_markdown(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            target = Path(directory)
-            self.init_kb(target)
-            result = subprocess.run(
-                [sys.executable, str(RENDER), str(target), "--module", "11"],
-                check=False, text=True, capture_output=True,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            exported = target / "exports" / "modules" / "11-product-offer-registry.md"
-            text = exported.read_text()
-            self.assertIn("# 11 — Product & Offer Registry", text)
-            self.assertIn("## Contesto autonomo", text)
-            self.assertIn("## Products", text)
-
-    def test_final_markdown_deduplicates_standalone_context(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            target = Path(directory)
-            self.init_kb(target, "onboarding")
-            result = subprocess.run(
-                [sys.executable, str(BUILD), str(target)],
-                check=False, text=True, capture_output=True,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            build_manifest = json.loads((target / "deliverables" / "build-manifest.json").read_text())
-            text = Path(build_manifest["output"]).read_text()
-            self.assertEqual(text.count("## Contesto globale"), 1)
-            self.assertNotIn("### Contesto autonomo", text)
-            self.assertIn("## Indice", text)
-            self.assertIn(
-                "[01 — Test Brand: Knowledge Base](#01-test-brand-knowledge-base)", text
-            )
-
-    def test_delivery_package_contains_final_and_module_files(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            target = Path(directory)
-            self.init_kb(target, "onboarding")
-            stale = target / "exports" / "modules" / "15-meta-ads-brief.md"
-            stale.write_text("stale export")
-            result = subprocess.run(
-                [sys.executable, str(PACKAGE), str(target)],
-                check=False, text=True, capture_output=True,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            package = next((target / "deliverables").glob("*.zip"))
-            with zipfile.ZipFile(package) as archive:
-                names = archive.namelist()
-            self.assertTrue(any(name.startswith("deliverables/") and name.endswith(".md") for name in names))
-            self.assertIn("modules/01-knowledge-base.md", names)
-            self.assertNotIn("modules/15-meta-ads-brief.md", names)
-            self.assertIn("manifest/kb-manifest.json", names)
 
 
 if __name__ == "__main__":

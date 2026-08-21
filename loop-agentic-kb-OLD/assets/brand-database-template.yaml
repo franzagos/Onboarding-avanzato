@@ -1,0 +1,45 @@
+meta:
+  schema_version: "2.1"
+  brand_id: "{{BRAND_ID}}"
+  generated_at: "{{DATE}}"
+  last_reviewed_at: null
+  status: "draft"
+  source_of_truth: true
+standalone_context:
+  brand_summary: "{{BRAND_ID}}"
+  scope: ["database_index"]
+  markets: []
+  languages: []
+  as_of: "{{DATE}}"
+  decisions_supported: ["route_agents", "resolve_authority", "inspect_readiness"]
+  allowed_uses: ["database_entry_point"]
+  prohibited_uses: ["treat_index_as_full_record_store"]
+  positioning_summary: null
+  relevant_family_ids: []
+  relevant_persona_ids: []
+  essential_evidence_ids: []
+  definitions: {}
+  limitations: []
+  blocking_input_ids: []
+module_quality:
+  coverage: "fail"
+  evidence: "fail"
+  depth: "fail"
+  actionability: "fail"
+  standalone_usability: "fail"
+  consistency: "fail"
+  freshness: "fail"
+  overall: "fail"
+database:
+  database_id: "KB-{{BRAND_ID}}"
+  authorities:
+    sources: "sources.yaml"
+    evidence: "evidence-ledger.yaml"
+    products_offers: "11-product-offer-registry.yaml"
+    claims: "12-claims-proof-library.yaml"
+    assets: "18-asset-library.yaml"
+    experiments: "21-experiment-memory.yaml"
+  modules: []
+  entity_index: {}
+  freshness: {}
+  readiness: {}

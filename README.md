@@ -6,9 +6,10 @@ Skill per generare knowledge base e-commerce riutilizzabili da agenti di onboard
 
 Scarica il pacchetto pronto all'installazione:
 
-- [`loop-agentic-kb.skill`](dist/loop-agentic-kb.skill)
+- versione aggiornata: [`loop-agentic-kb.skill`](dist/loop-agentic-kb.skill)
+- versione precedente, conservata come OLD: [`loop-agentic-kb-OLD.skill`](dist/loop-agentic-kb-OLD.skill)
 
-Il sorgente completo è disponibile nella cartella [`loop-agentic-kb/`](loop-agentic-kb/).
+Il sorgente aggiornato è disponibile in [`loop-agentic-kb/`](loop-agentic-kb/). Lo snapshot integrale della versione precedente è conservato in [`loop-agentic-kb-OLD/`](loop-agentic-kb-OLD/).
 
 ## Cosa genera
 
@@ -37,6 +38,9 @@ Il sorgente completo è disponibile nella cartella [`loop-agentic-kb/`](loop-age
 - `brand-database.yaml` come entry point unico della fonte di verità;
 - ogni modulo come vista autonoma con contesto, coverage, prove, conclusioni e next action;
 - gate separati per completezza sostanziale e readiness di attivazione.
+- profili modulari per generare soltanto le parti necessarie;
+- export Markdown di ogni modulo, inclusi i registri canonici YAML;
+- dossier finale deduplicato e pacchetto ZIP su richiesta.
 
 ## Come gestisce i dati mancanti
 
@@ -75,8 +79,11 @@ Per generare la struttura vuota:
 ```bash
 python3 loop-agentic-kb/scripts/init_kb.py \
   --brand "Nome Brand" \
+  --profile onboarding \
   --output /percorso/output
 ```
+
+I profili disponibili sono `onboarding`, `meta`, `google`, `activation`, `full` e `custom`. Il profilo `custom` accetta `--modules` seguito dagli ID richiesti.
 
 Per validare una KB completa:
 
@@ -90,6 +97,24 @@ Per validare soltanto il nucleo ADV/Google:
 
 ```bash
 python3 loop-agentic-kb/scripts/validate_kb.py /percorso/output --mode nucleus
+```
+
+Per generare il Markdown di ogni parte prevista dal manifest:
+
+```bash
+python3 loop-agentic-kb/scripts/render_module.py /percorso/output
+```
+
+Per unire tutto il lavoro completato in un solo file Markdown:
+
+```bash
+python3 loop-agentic-kb/scripts/build_final_md.py /percorso/output
+```
+
+Per creare anche un pacchetto ZIP con dossier, moduli e dati canonici:
+
+```bash
+python3 loop-agentic-kb/scripts/package_delivery.py /percorso/output
 ```
 
 ## Stato

@@ -4,14 +4,22 @@
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 import re
 
-from module_catalog import CORE_FILES, MODULES, PROFILES, select_module_ids
 
-FULL_REQUIRED = [module.filename for module in MODULES] + [
-    *CORE_FILES, "strategic-summary.md", "review-checklist.yaml",
+FULL_REQUIRED = [
+    "00-agent-manifest.md", "01-knowledge-base.md", "02-product-message-map.md",
+    "03-competitors.md", "04-personas.md", "05-psychographics.md",
+    "06-pain-points.md", "07-reviews-voc.md", "08-brand-voice.md",
+    "09-tone-of-voice.md", "10-lexicon.md", "11-product-offer-registry.yaml",
+    "12-claims-proof-library.yaml", "13-funnel-awareness-matrix.yaml",
+    "14-creative-strategy-library.yaml", "15-meta-ads-brief.yaml",
+    "16-google-ads-playbook.md", "17-landing-page-map.yaml",
+    "18-asset-library.yaml", "19-market-packs", "20-measurement-framework.yaml",
+    "21-experiment-memory.yaml", "sources.yaml", "evidence-ledger.yaml",
+    "assumptions-and-gaps.yaml", "context-pack.yaml", "strategic-summary.md",
+    "brand-database.yaml", "review-checklist.yaml", "qa-report.yaml",
 ]
 
 NUCLEUS_REQUIRED = [
@@ -117,8 +125,6 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("path", type=Path)
     parser.add_argument("--mode", choices=["full", "nucleus"], default="full")
-    parser.add_argument("--profile", choices=["auto", *PROFILES, "custom"], default="auto")
-    parser.add_argument("--modules", nargs="*")
     parser.add_argument("--stage", choices=["draft", "review", "activation"], default="review")
     parser.add_argument("--compat-v1", action="store_true")
     args = parser.parse_args()
@@ -130,30 +136,7 @@ def main() -> int:
         print(f"ERROR: not a directory: {root}")
         return 2
 
-    selected_ids: tuple[str, ...] = ()
-    profile = args.profile
-    if profile == "auto" and (root / "kb-manifest.json").exists():
-        try:
-            manifest = json.loads((root / "kb-manifest.json").read_text(encoding="utf-8"))
-            profile = manifest.get("profile", "full")
-            selected_ids = tuple(str(item["id"]) for item in manifest.get("modules", []))
-        except (json.JSONDecodeError, KeyError, TypeError) as error:
-            errors.append(f"kb-manifest.json: invalid manifest ({error})")
-    elif profile != "auto":
-        try:
-            selected_ids = select_module_ids(profile, args.modules)
-        except ValueError as error:
-            errors.append(str(error))
-
-    if selected_ids:
-        selected = {module.module_id for module in MODULES if module.module_id in selected_ids}
-        required = [module.filename for module in MODULES if module.module_id in selected]
-        required.extend(CORE_FILES)
-        required.append("strategic-summary.md")
-        if profile in {"activation", "full"}:
-            required.append("review-checklist.yaml")
-    else:
-        required = FULL_REQUIRED if args.mode == "full" else NUCLEUS_REQUIRED
+    required = FULL_REQUIRED if args.mode == "full" else NUCLEUS_REQUIRED
     for name in required:
         if not (root / name).exists():
             errors.append(f"missing: {name}")
@@ -164,11 +147,8 @@ def main() -> int:
         (warnings if args.compat_v1 else errors).append(message)
 
     texts: dict[str, str] = {}
-    canonical_paths = sorted(root.rglob("*.md")) + sorted(root.rglob("*.yaml"))
-    for path in canonical_paths:
+    for path in sorted(root.rglob("*.md")) + sorted(root.rglob("*.yaml")):
         relative = path.relative_to(root).as_posix()
-        if relative.startswith(("exports/", "deliverables/", "staging/")):
-            continue
         text = path.read_text(encoding="utf-8")
         texts[relative] = text
         if "\t" in text:
@@ -241,20 +221,10 @@ def main() -> int:
             errors.append(f"{relative}: module_quality.overall must be pass at {args.stage} stage")
 
     database_text = texts.get("brand-database.yaml", "")
-    required_authorities = ["sources.yaml", "evidence-ledger.yaml"]
-    authority_modules = {
-        "11": "11-product-offer-registry.yaml",
-        "12": "12-claims-proof-library.yaml",
-        "18": "18-asset-library.yaml",
-        "21": "21-experiment-memory.yaml",
-    }
-    if selected_ids:
-        required_authorities.extend(
-            filename for module_id, filename in authority_modules.items() if module_id in selected_ids
-        )
-    else:
-        required_authorities.extend(authority_modules.values())
-    for authority in required_authorities:
+    for authority in (
+        "sources.yaml", "evidence-ledger.yaml", "11-product-offer-registry.yaml",
+        "12-claims-proof-library.yaml", "18-asset-library.yaml", "21-experiment-memory.yaml",
+    ):
         if authority not in database_text:
             errors.append(f"brand-database.yaml: missing authority {authority}")
 
@@ -306,9 +276,8 @@ def main() -> int:
         print(f"ERROR: {message}")
     for message in sorted(set(warnings)):
         print(f"WARN: {message}")
-    validation_scope = profile if selected_ids else args.mode
     print(
-        f"Validation complete ({validation_scope}/{args.stage}): "
+        f"Validation complete ({args.mode}/{args.stage}): "
         f"{len(set(errors))} error(s), {len(set(warnings))} warning(s)"
     )
     return 1 if errors else 0

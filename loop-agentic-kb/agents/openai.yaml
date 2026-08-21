@@ -1,4 +1,4 @@
 interface:
   display_name: "Loop Agentic KB"
-  short_description: "Crea database brand profondi e moduli autonomi"
-  default_prompt: "Usa $loop-agentic-kb per creare un database brand profondo con moduli utilizzabili singolarmente; chiedimi gli input bloccanti iniziando con 'Mi serve'."
+  short_description: "Crea KB e file Markdown modulari o completi"
+  default_prompt: "Usa $loop-agentic-kb per creare una KB e-commerce evidence-first, consegnarmi ogni parte come file Markdown e, quando lo chiedo, unire tutto in un dossier finale."

@@ -54,7 +54,7 @@ review-checklist.yaml
 qa-report.yaml
 ```
 
-Il formato Markdown serve alla lettura umana; YAML serve al consumo da parte di altri agenti. Il manifest elenca soltanto i moduli richiesti dal profilo. Se un modulo selezionato non è applicabile, il relativo file usa `status: not_applicable` e ne spiega il motivo; non creare stub per moduli fuori scope.
+Il formato Markdown serve alla lettura umana; YAML serve al consumo da parte di altri agenti. Se un modulo non è applicabile, il file viene comunque creato con `status: not_applicable` e motivazione.
 
 `brand-database.yaml` indicizza autorità, entità, moduli, versioni e freshness. I moduli includono viste autonome derivate con `generated_from`; non diventano autorità concorrenti.
 
@@ -225,8 +225,6 @@ Il reviewer controlla il pacchetto senza vedere le conclusioni attese. L'orchest
 
 Il reviewer ripete il controllo con un file alla volta. Compila `module_assessments` in `qa-report.yaml`; nessun file con `standalone_usability: fail` può entrare nel package finale come completo.
 
-L'orchestratore genera `exports/modules/<module>.md` al completamento di ogni parte. Su richiesta dell'utente genera un dossier deduplicato con `scripts/build_final_md.py` e il pacchetto completo con `scripts/package_delivery.py`. Le viste esportate non sono autorità canoniche e non devono essere modificate direttamente.
-
 ## Regole di parallelizzazione
 
 ### Parallelizzare quando
@@ -329,7 +327,7 @@ Ogni dimensione usa `pass|conditional|blocked|not_applicable` e include blocker 
 
 Il package è consegnabile solo se:
 
-- tutti i file selezionati nel manifest esistono o dichiarano `not_applicable`;
+- tutti i file previsti esistono o dichiarano `not_applicable`;
 - il 100% dei fatti commercialmente rilevanti ha source ID;
 - inferenze e ipotesi sono etichettate;
 - claim pubblicitari hanno stato, prova, scope e freshness;

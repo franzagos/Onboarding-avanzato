@@ -93,12 +93,6 @@ do_not_assume: []
 
 L'orchestratore deve rifiutare un handoff che non distingue decisioni, ipotesi e gap.
 
-## Contratto di consegna
-
-Al completamento di un modulo, conservare il file canonico e generare la vista umana in `exports/modules/` con `scripts/render_module.py`. Anche i moduli canonici YAML devono avere una proiezione Markdown. Restituire all'utente il link al file e un handoff breve, senza duplicare il report nella chat.
-
-Quando l'utente richiede il lavoro unificato, usare `scripts/build_final_md.py`: includere una sola volta il contesto globale e mantenere nei singoli export il contesto autonomo. Usare `scripts/package_delivery.py` per consegnare dossier, moduli, manifest e registri canonici in uno ZIP.
-
 ## Registri trasversali
 
 | File | Autorità |
